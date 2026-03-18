@@ -7,8 +7,10 @@ namespace Jose\Tests\Component\Encryption\RFC7520;
 use Jose\Component\Core\JWK;
 use Jose\Component\Core\Util\Base64UrlSafe;
 use Jose\Tests\Component\Encryption\EncryptionTestCase;
-use PHPUnit\Framework\Attributes\Test;
+
 use const JSON_THROW_ON_ERROR;
+
+use PHPUnit\Framework\Attributes\Test;
 
 /**
  * @see https://tools.ietf.org/html/rfc7520#section-5.3

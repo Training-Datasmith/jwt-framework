@@ -5,19 +5,23 @@ declare(strict_types=1);
 namespace Jose\Bundle\JoseFramework\Serializer;
 
 use Exception;
+
+use function in_array;
+use function is_int;
+
 use Jose\Component\Encryption\JWE;
 use Jose\Component\Encryption\Serializer\JWESerializerManager;
 use Jose\Component\Encryption\Serializer\JWESerializerManagerFactory;
 use LogicException;
 use Override;
+
+use function sprintf;
+
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
 use Symfony\Component\Serializer\Encoder\NormalizationAwareInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Throwable;
-use function in_array;
-use function is_int;
-use function sprintf;
 
 final readonly class JWEEncoder implements EncoderInterface, DecoderInterface, NormalizationAwareInterface
 {

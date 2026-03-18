@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Jose\Bundle\JoseFramework\Routing;
 
+use function assert;
+
 use Override;
+
+use function sprintf;
+
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Loader\LoaderResolverInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use function assert;
-use function sprintf;
 
 final class JWKSetLoader implements LoaderInterface
 {

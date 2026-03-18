@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Jose\Tests\Bundle\JoseFramework\TestBundle\Service;
 
+use function sprintf;
+
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
-use function sprintf;
 
 final class MockClientCallback extends MockHttpClient
 {

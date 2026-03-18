@@ -8,11 +8,13 @@ use Jose\Bundle\JoseFramework\DependencyInjection\Source\Source;
 use Jose\Component\Signature\Serializer\JWSSerializerManager;
 use Jose\Component\Signature\Serializer\JWSSerializerManagerFactory;
 use Override;
+
+use function sprintf;
+
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use function sprintf;
 
 final readonly class JWSSerializer implements Source
 {

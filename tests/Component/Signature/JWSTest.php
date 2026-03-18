@@ -7,9 +7,11 @@ namespace Jose\Tests\Component\Signature;
 use InvalidArgumentException;
 use Jose\Component\Core\Util\Base64UrlSafe;
 use Jose\Component\Signature\JWS;
+
+use const JSON_THROW_ON_ERROR;
+
 use LogicException;
 use PHPUnit\Framework\Attributes\Test;
-use const JSON_THROW_ON_ERROR;
 
 /**
  * @internal

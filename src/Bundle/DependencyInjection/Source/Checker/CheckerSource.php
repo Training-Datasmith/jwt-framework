@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Jose\Bundle\JoseFramework\DependencyInjection\Source\Checker;
 
+use function array_key_exists;
+use function count;
+
 use Jose\Bundle\JoseFramework\DependencyInjection\Compiler\ClaimCheckerCompilerPass;
 use Jose\Bundle\JoseFramework\DependencyInjection\Compiler\HeaderCheckerCompilerPass;
 use Jose\Bundle\JoseFramework\DependencyInjection\Source\Source;
@@ -15,8 +18,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use function array_key_exists;
-use function count;
 
 final readonly class CheckerSource implements SourceWithCompilerPasses
 {

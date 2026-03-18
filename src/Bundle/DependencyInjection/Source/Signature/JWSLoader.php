@@ -8,11 +8,13 @@ use Jose\Bundle\JoseFramework\DependencyInjection\Source\Source;
 use Jose\Bundle\JoseFramework\Services\JWSLoaderFactory;
 use Jose\Component\Signature\JWSLoader as JWSLoaderService;
 use Override;
+
+use function sprintf;
+
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use function sprintf;
 
 final readonly class JWSLoader implements Source
 {

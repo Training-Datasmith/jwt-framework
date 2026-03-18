@@ -7,9 +7,11 @@ namespace Jose\Bundle\JoseFramework\DependencyInjection\Compiler;
 use InvalidArgumentException;
 use Jose\Bundle\JoseFramework\Routing\JWKSetLoader;
 use Override;
+
+use function sprintf;
+
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use function sprintf;
 
 final readonly class KeySetControllerCompilerPass implements CompilerPassInterface
 {

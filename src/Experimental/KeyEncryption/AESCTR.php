@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace Jose\Experimental\KeyEncryption;
 
+use function in_array;
+
 use InvalidArgumentException;
+
+use function is_string;
+
 use Jose\Component\Core\JWK;
 use Jose\Component\Core\Util\Base64UrlSafe;
 use Jose\Component\Encryption\Algorithm\KeyEncryption\KeyEncryption;
+
+use const OPENSSL_RAW_DATA;
+
 use Override;
 use RuntimeException;
-use function in_array;
-use function is_string;
-use const OPENSSL_RAW_DATA;
 
 abstract readonly class AESCTR implements KeyEncryption
 {

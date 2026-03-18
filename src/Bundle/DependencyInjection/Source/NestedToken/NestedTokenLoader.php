@@ -8,11 +8,13 @@ use Jose\Bundle\JoseFramework\DependencyInjection\Source\Source;
 use Jose\Bundle\JoseFramework\Services\NestedTokenLoaderFactory;
 use Jose\Component\NestedToken\NestedTokenLoader as NestedTokenLoaderService;
 use Override;
+
+use function sprintf;
+
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use function sprintf;
 
 final readonly class NestedTokenLoader implements Source
 {

@@ -4,17 +4,23 @@ declare(strict_types=1);
 
 namespace Jose\Experimental\KeyEncryption;
 
+use function in_array;
+
 use InvalidArgumentException;
+
+use function is_string;
+
 use Jose\Component\Core\JWK;
 use Jose\Component\Core\Util\Base64UrlSafe;
 use Jose\Component\Encryption\Algorithm\KeyEncryption\KeyEncryption;
 use LogicException;
+
+use const OPENSSL_RAW_DATA;
+
 use Override;
 use RuntimeException;
-use function in_array;
-use function is_string;
+
 use function strlen;
-use const OPENSSL_RAW_DATA;
 
 final readonly class Chacha20Poly1305 implements KeyEncryption
 {

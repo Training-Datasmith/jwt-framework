@@ -19,9 +19,11 @@ use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 use Jose\Component\Signature\Serializer\JSONGeneralSerializer;
+
+use const JSON_THROW_ON_ERROR;
+
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use const JSON_THROW_ON_ERROR;
 
 /**
  * @internal

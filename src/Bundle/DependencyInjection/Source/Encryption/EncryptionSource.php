@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Jose\Bundle\JoseFramework\DependencyInjection\Source\Encryption;
 
+use function array_key_exists;
+use function count;
+use function in_array;
+
 use Jose\Bundle\JoseFramework\DependencyInjection\Compiler\EncryptionSerializerCompilerPass;
 use Jose\Bundle\JoseFramework\DependencyInjection\Source\Source;
 use Jose\Bundle\JoseFramework\DependencyInjection\Source\SourceWithCompilerPasses;
@@ -24,9 +28,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use function array_key_exists;
-use function count;
-use function in_array;
 
 final readonly class EncryptionSource implements SourceWithCompilerPasses
 {

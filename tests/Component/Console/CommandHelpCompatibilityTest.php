@@ -7,8 +7,10 @@ namespace Jose\Tests\Component\Console;
 use Jose\Tests\Bundle\JoseFramework\KernelTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
+
 use function sprintf;
+
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 /**
  * @internal

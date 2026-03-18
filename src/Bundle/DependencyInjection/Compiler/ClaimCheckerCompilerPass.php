@@ -7,10 +7,12 @@ namespace Jose\Bundle\JoseFramework\DependencyInjection\Compiler;
 use InvalidArgumentException;
 use Jose\Bundle\JoseFramework\Services\ClaimCheckerManagerFactory;
 use Override;
+
+use function sprintf;
+
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use function sprintf;
 
 final readonly class ClaimCheckerCompilerPass implements CompilerPassInterface
 {

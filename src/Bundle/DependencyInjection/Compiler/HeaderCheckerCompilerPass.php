@@ -7,11 +7,13 @@ namespace Jose\Bundle\JoseFramework\DependencyInjection\Compiler;
 use InvalidArgumentException;
 use Jose\Bundle\JoseFramework\Services\HeaderCheckerManagerFactory;
 use Override;
+
+use function sprintf;
+
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use function sprintf;
 
 final readonly class HeaderCheckerCompilerPass implements CompilerPassInterface
 {

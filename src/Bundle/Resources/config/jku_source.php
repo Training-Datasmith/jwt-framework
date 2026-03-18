@@ -5,8 +5,10 @@ declare(strict_types=1);
 use Jose\Component\KeyManagement\JKUFactory;
 use Jose\Component\KeyManagement\X5UFactory;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 return function (ContainerConfigurator $container): void {
     $container = $container->services()

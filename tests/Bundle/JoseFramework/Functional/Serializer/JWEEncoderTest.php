@@ -15,9 +15,11 @@ use Jose\Component\Encryption\Serializer\JWESerializerManagerFactory;
 use Jose\Tests\Bundle\JoseFramework\KernelTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
+
+use function sprintf;
+
 use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
-use function sprintf;
 
 /**
  * @internal

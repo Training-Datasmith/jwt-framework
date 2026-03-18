@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace Jose\Tests\EncryptionAlgorithm\Experimental;
 
+use function in_array;
+
 use Jose\Component\Core\JWK;
 use Jose\Experimental\KeyEncryption\Chacha20Poly1305;
 use Override;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Throwable;
-use function in_array;
+
 use function sprintf;
+
+use Throwable;
 
 /**
  * @internal

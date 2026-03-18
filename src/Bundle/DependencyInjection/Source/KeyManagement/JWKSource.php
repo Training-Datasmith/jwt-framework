@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace Jose\Bundle\JoseFramework\DependencyInjection\Source\KeyManagement;
 
+use function array_key_exists;
+use function count;
+
 use InvalidArgumentException;
 use Jose\Bundle\JoseFramework\DependencyInjection\Source\KeyManagement\JWKSource\JWKSource as JWKSourceInterface;
 use Jose\Bundle\JoseFramework\DependencyInjection\Source\Source;
 use LogicException;
 use Override;
+
+use function sprintf;
+
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use function array_key_exists;
-use function count;
-use function sprintf;
 
 final class JWKSource implements Source
 {

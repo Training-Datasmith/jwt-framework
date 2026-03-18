@@ -7,10 +7,12 @@ namespace Jose\Bundle\JoseFramework\DependencyInjection\Source\Encryption;
 use Jose\Bundle\JoseFramework\Services\JWEBuilderFactory;
 use Jose\Component\Encryption\JWEBuilder as JWEBuilderService;
 use Override;
+
+use function sprintf;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use function sprintf;
 
 final readonly class JWEBuilder extends AbstractEncryptionSource
 {
