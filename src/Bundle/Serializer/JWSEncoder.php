@@ -45,7 +45,7 @@ final readonly class JWSEncoder implements EncoderInterface, DecoderInterface, N
     }
 
     #[Override]
-    public function encode($data, $format, array $context = []): string
+    public function encode($data, string $format, array $context = []): string
     {
         if ($data instanceof JWS === false) {
             throw new LogicException('Expected data to be a JWS.');
@@ -63,7 +63,7 @@ final readonly class JWSEncoder implements EncoderInterface, DecoderInterface, N
     }
 
     #[Override]
-    public function decode($data, $format, array $context = []): JWS
+    public function decode(string $data, string $format, array $context = []): JWS
     {
         try {
             return $this->serializerManager->unserialize($data);

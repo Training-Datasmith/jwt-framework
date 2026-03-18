@@ -14,7 +14,7 @@ use Throwable;
 final class ClaimCheckerManager extends BaseClaimCheckerManager
 {
     public function __construct(
-        $checkers,
+        iterable $checkers,
         private readonly EventDispatcherInterface $eventDispatcher
     ) {
         parent::__construct($checkers);
