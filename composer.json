@@ -34,7 +34,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Jose\\Bundle\\JoseFramework\\": "src/Bundle/",
+            "Jose\\Bundle\\Jose_Framework\\": "src/Bundle/",
             "Jose\\Experimental\\": "src/Experimental/",
             "Jose\\Component\\": "src/Library/"
         }
