@@ -10,12 +10,12 @@ framework:
   fragments: ~
   http_method_override: true
   http_client:
-    mock_response_factory: 'Jose\Tests\Bundle\JoseFramework\TestBundle\Service\MockClientCallback'
+    mock_response_factory: 'Jose\Tests\Bundle\Jose_Framework\Test_Bundle\Service\Mock_Client_Callback'
 
 services:
   _defaults:
     public: true
-  Jose\Tests\Bundle\JoseFramework\TestBundle\Service\MockClientCallback: ~
+  Jose\Tests\Bundle\Jose_Framework\Test_Bundle\Service\Mock_Client_Callback: ~
 
 jose:
   jku_factory:
