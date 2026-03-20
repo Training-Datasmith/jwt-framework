@@ -1,82 +1,68 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Signature\Algorithm;
 
 use function defined;
 use function extension_loaded;
 use function in_array;
-
 use InvalidArgumentException;
 use Jose\Component\Core\JWK;
-use Jose\Component\Core\Util\ECKey;
-use Jose\Component\Core\Util\ECSignature;
+use Jose\Component\Core\Util\Ec_Key;
+use Jose\Component\Core\Util\Ec_Signature;
 use LogicException;
 use Override;
 use RuntimeException;
-
 use function sprintf;
-
 use Throwable;
-
-abstract readonly class ECDSA implements SignatureAlgorithm
+abstract readonly class ECDSA implements Signature_Algorithm
 {
     public function __construct()
     {
-        if (! extension_loaded('openssl')) {
+        if (!extension_loaded('openssl')) {
             throw new RuntimeException('Please install the OpenSSL extension');
         }
-        if (! defined('OPENSSL_KEYTYPE_EC')) {
+        if (!defined('OPENSSL_KEYTYPE_EC')) {
             throw new LogicException('Elliptic Curve key type not supported by your environment.');
         }
     }
-
     #[Override]
-    public function allowedKeyTypes(): array
+    public function allowed_key_types(): array
     {
         return ['EC'];
     }
-
     #[Override]
     public function sign(JWK $key, string $input): string
     {
-        $this->checkKey($key);
-        if (! $key->has('d')) {
+        $this->check_key($key);
+        if (!$key->has('d')) {
             throw new InvalidArgumentException('The EC key is not private');
         }
-        $pem = ECKey::convertPrivateKeyToPEM($key);
-        openssl_sign($input, $signature, $pem, $this->getHashAlgorithm());
-
-        return ECSignature::fromAsn1($signature, $this->getSignaturePartLength());
+        $pem = Ec_Key::convert_private_key_to_pem($key);
+        openssl_sign($input, $signature, $pem, $this->get_hash_algorithm());
+        return Ec_Signature::from_asn1($signature, $this->get_signature_part_length());
     }
-
     #[Override]
     public function verify(JWK $key, string $input, string $signature): bool
     {
-        $this->checkKey($key);
-
+        $this->check_key($key);
         try {
-            $der = ECSignature::toAsn1($signature, $this->getSignaturePartLength());
-            $pem = ECKey::convertPublicKeyToPEM($key);
-
-            return openssl_verify($input, $der, $pem, $this->getHashAlgorithm()) === 1;
+            $der = Ec_Signature::to_asn1($signature, $this->get_signature_part_length());
+            $pem = Ec_Key::convert_public_key_to_pem($key);
+            return openssl_verify($input, $der, $pem, $this->get_hash_algorithm()) === 1;
         } catch (Throwable) {
             return false;
         }
     }
-
-    abstract protected function getHashAlgorithm(): string;
-
-    abstract protected function getSignaturePartLength(): int;
-
-    private function checkKey(JWK $key): void
+    abstract protected function get_hash_algorithm(): string;
+    abstract protected function get_signature_part_length(): int;
+    private function check_key(JWK $key): void
     {
-        if (! in_array($key->get('kty'), $this->allowedKeyTypes(), true)) {
+        if (!in_array($key->get('kty'), $this->allowed_key_types(), true)) {
             throw new InvalidArgumentException('Wrong key type.');
         }
         foreach (['x', 'y', 'crv'] as $k) {
-            if (! $key->has($k)) {
+            if (!$key->has($k)) {
                 throw new InvalidArgumentException(sprintf('The key parameter "%s" is missing.', $k));
             }
         }

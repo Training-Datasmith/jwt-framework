@@ -1,50 +1,36 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Event;
 
-namespace Jose\Bundle\JoseFramework\Event;
-
-use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Event_Dispatcher\Event;
 use Throwable;
-
-final class JWEBuiltFailureEvent extends Event
+final class Jwe_Built_Failure_Event extends Event
 {
-    public function __construct(
-        private readonly ?string $payload,
-        private readonly array $recipients,
-        private readonly array $sharedProtectedHeader,
-        private readonly array $sharedHeader,
-        private readonly ?string $aad,
-        private readonly Throwable $throwable
-    ) {
+    public function __construct(private readonly ?string $payload, private readonly array $recipients, private readonly array $shared_protected_header, private readonly array $shared_header, private readonly ?string $aad, private readonly Throwable $throwable)
+    {
     }
-
-    public function getPayload(): ?string
+    public function get_payload(): ?string
     {
         return $this->payload;
     }
-
-    public function getRecipients(): array
+    public function get_recipients(): array
     {
         return $this->recipients;
     }
-
-    public function getSharedProtectedHeader(): array
+    public function get_shared_protected_header(): array
     {
-        return $this->sharedProtectedHeader;
+        return $this->shared_protected_header;
     }
-
-    public function getSharedHeader(): array
+    public function get_shared_header(): array
     {
-        return $this->sharedHeader;
+        return $this->shared_header;
     }
-
-    public function getAad(): ?string
+    public function get_aad(): ?string
     {
         return $this->aad;
     }
-
-    public function getThrowable(): Throwable
+    public function get_throwable(): Throwable
     {
         return $this->throwable;
     }

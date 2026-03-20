@@ -1,72 +1,59 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Console;
 
 use InvalidArgumentException;
-
 use function is_array;
 use function is_string;
-
 use Jose\Component\Core\JWK;
-use Jose\Component\Core\JWKSet;
-use Jose\Component\Core\Util\JsonConverter;
+use Jose\Component\Core\Jwk_Set;
+use Jose\Component\Core\Util\Json_Converter;
 use Override;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
-#[AsCommand(name: 'keyset:add:key', description: 'Add a key into a key set.')]
-final class AddKeyIntoKeysetCommand extends ObjectOutputCommand
+use Symfony\Component\Console\Attribute\As_Command;
+use Symfony\Component\Console\Input\Input_Argument;
+use Symfony\Component\Console\Input\Input_Interface;
+use Symfony\Component\Console\Output\Output_Interface;
+#[As_Command(name: 'keyset:add:key', description: 'Add a key into a key set.')]
+final class Add_Key_Into_Keyset_Command extends Object_Output_Command
 {
     #[Override]
     protected function configure(): void
     {
         parent::configure();
-        $this
-            ->setHelp('This command adds a key at the end of a key set.')
-            ->addArgument('jwkset', InputArgument::REQUIRED, 'The JWKSet object')
-            ->addArgument('jwk', InputArgument::REQUIRED, 'The new JWK object');
+        $this->set_help('This command adds a key at the end of a key set.')->add_argument('jwkset', Input_Argument::REQUIRED, 'The JWKSet object')->add_argument('jwk', Input_Argument::REQUIRED, 'The new JWK object');
     }
-
     #[Override]
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(Input_Interface $input, Output_Interface $output): int
     {
-        $jwkset = $this->getKeyset($input);
-        $jwk = $this->getKey($input);
+        $jwkset = $this->get_keyset($input);
+        $jwk = $this->get_key($input);
         $jwkset = $jwkset->with($jwk);
-        $this->prepareJsonOutput($input, $output, $jwkset);
-
+        $this->prepare_json_output($input, $output, $jwkset);
         return self::SUCCESS;
     }
-
-    private function getKeyset(InputInterface $input): JWKSet
+    private function get_keyset(Input_Interface $input): Jwk_Set
     {
-        $jwkset = $input->getArgument('jwkset');
-        if (! is_string($jwkset)) {
+        $jwkset = $input->get_argument('jwkset');
+        if (!is_string($jwkset)) {
             throw new InvalidArgumentException('The argument must be a valid JWKSet.');
         }
-        $json = JsonConverter::decode($jwkset);
-        if (! is_array($json)) {
+        $json = Json_Converter::decode($jwkset);
+        if (!is_array($json)) {
             throw new InvalidArgumentException('The argument must be a valid JWKSet.');
         }
-
-        return JWKSet::createFromKeyData($json);
+        return Jwk_Set::create_from_key_data($json);
     }
-
-    private function getKey(InputInterface $input): JWK
+    private function get_key(Input_Interface $input): JWK
     {
-        $jwk = $input->getArgument('jwk');
-        if (! is_string($jwk)) {
+        $jwk = $input->get_argument('jwk');
+        if (!is_string($jwk)) {
             throw new InvalidArgumentException('The argument must be a valid JWK.');
         }
-        $json = JsonConverter::decode($jwk);
-        if (! is_array($json)) {
+        $json = Json_Converter::decode($jwk);
+        if (!is_array($json)) {
             throw new InvalidArgumentException('The argument must be a valid JWK.');
         }
-
         return new JWK($json);
     }
 }

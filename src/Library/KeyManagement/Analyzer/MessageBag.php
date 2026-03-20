@@ -1,26 +1,21 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Jose\Component\KeyManagement\Analyzer;
+declare (strict_types=1);
+namespace Jose\Component\Key_Management\Analyzer;
 
 use ArrayIterator;
-
 use function count;
-
 use Countable;
 use IteratorAggregate;
 use JsonSerializable;
 use Override;
 use Traversable;
-
-final class MessageBag implements JsonSerializable, IteratorAggregate, Countable
+final class Message_Bag implements JsonSerializable, IteratorAggregate, Countable
 {
     /**
      * @var Message[]
      */
     private array $messages = [];
-
     /**
      * Adds a message to the message bag.
      */
@@ -28,7 +23,6 @@ final class MessageBag implements JsonSerializable, IteratorAggregate, Countable
     {
         $this->messages[] = $message;
     }
-
     /**
      * Returns all messages.
      *
@@ -38,19 +32,16 @@ final class MessageBag implements JsonSerializable, IteratorAggregate, Countable
     {
         return $this->messages;
     }
-
     #[Override]
     public function jsonSerialize(): array
     {
         return array_values($this->messages);
     }
-
     #[Override]
     public function count(): int
     {
         return count($this->messages);
     }
-
     #[Override]
     public function getIterator(): Traversable
     {

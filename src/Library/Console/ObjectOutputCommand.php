@@ -1,20 +1,18 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Console;
 
-use Jose\Component\Core\Util\JsonConverter;
+use Jose\Component\Core\Util\Json_Converter;
 use JsonSerializable;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
-abstract class ObjectOutputCommand extends Command
+use Symfony\Component\Console\Input\Input_Interface;
+use Symfony\Component\Console\Output\Output_Interface;
+abstract class Object_Output_Command extends Command
 {
-    protected function prepareJsonOutput(InputInterface $input, OutputInterface $output, JsonSerializable $json): void
+    protected function prepare_json_output(Input_Interface $input, Output_Interface $output, JsonSerializable $json): void
     {
-        $data = JsonConverter::encode($json);
+        $data = Json_Converter::encode($json);
         $output->write($data);
     }
 }

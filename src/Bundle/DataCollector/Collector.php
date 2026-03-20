@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Data_Collector;
 
-namespace Jose\Bundle\JoseFramework\DataCollector;
-
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Http_Foundation\Request;
+use Symfony\Component\Http_Foundation\Response;
 use Throwable;
-
 interface Collector
 {
     /**

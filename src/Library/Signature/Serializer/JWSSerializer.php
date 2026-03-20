@@ -1,25 +1,20 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Signature\Serializer;
 
 use Jose\Component\Signature\JWS;
-
-interface JWSSerializer
+interface Jws_Serializer
 {
     /**
      * The name of the serialization.
      */
     public function name(): string;
-
-    public function displayName(): string;
-
+    public function display_name(): string;
     /**
      * Converts a JWS into a string.
      */
-    public function serialize(JWS $jws, ?int $signatureIndex = null): string;
-
+    public function serialize(JWS $jws, ?int $signature_index = null): string;
     /**
      * Loads data and return a JWS object.
      *

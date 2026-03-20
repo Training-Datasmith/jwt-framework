@@ -1,36 +1,30 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Signature\Serializer;
 
 use InvalidArgumentException;
-
 use function sprintf;
-
-final class JWSSerializerManagerFactory
+final class Jws_Serializer_Manager_Factory
 {
     /**
      * @var JWSSerializer[]
      */
     private array $serializers = [];
-
     /**
      * @param string[] $names
      */
-    public function create(array $names): JWSSerializerManager
+    public function create(array $names): Jws_Serializer_Manager
     {
         $serializers = [];
         foreach ($names as $name) {
-            if (! isset($this->serializers[$name])) {
+            if (!isset($this->serializers[$name])) {
                 throw new InvalidArgumentException(sprintf('Unsupported serializer "%s".', $name));
             }
             $serializers[] = $this->serializers[$name];
         }
-
-        return new JWSSerializerManager($serializers);
+        return new Jws_Serializer_Manager($serializers);
     }
-
     /**
      * @return string[]
      */
@@ -38,7 +32,6 @@ final class JWSSerializerManagerFactory
     {
         return array_keys($this->serializers);
     }
-
     /**
      * @return JWSSerializer[]
      */
@@ -46,8 +39,7 @@ final class JWSSerializerManagerFactory
     {
         return $this->serializers;
     }
-
-    public function add(JWSSerializer $serializer): void
+    public function add(Jws_Serializer $serializer): void
     {
         $this->serializers[$serializer->name()] = $serializer;
     }

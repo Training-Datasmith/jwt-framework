@@ -1,35 +1,30 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Jose\Component\KeyManagement\Analyzer;
+declare (strict_types=1);
+namespace Jose\Component\Key_Management\Analyzer;
 
 use Jose\Component\Core\Util\Ecc\Curve;
-use Jose\Component\Core\Util\Ecc\NistCurve;
+use Jose\Component\Core\Util\Ecc\Nist_Curve;
 use Override;
-
-final readonly class ES512KeyAnalyzer extends ESKeyAnalyzer
+final readonly class Es512key_Analyzer extends Es_Key_Analyzer
 {
     #[Override]
-    protected function getAlgorithmName(): string
+    protected function get_algorithm_name(): string
     {
         return 'ES512';
     }
-
     #[Override]
-    protected function getCurveName(): string
+    protected function get_curve_name(): string
     {
         return 'P-521';
     }
-
     #[Override]
-    protected function getCurve(): Curve
+    protected function get_curve(): Curve
     {
-        return NistCurve::curve521();
+        return Nist_Curve::curve521();
     }
-
     #[Override]
-    protected function getKeySize(): int
+    protected function get_key_size(): int
     {
         return 528;
     }

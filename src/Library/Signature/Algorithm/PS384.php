@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Signature\Algorithm;
 
 use Override;
-
 final readonly class PS384 extends RSAPSS
 {
     #[Override]
@@ -13,9 +11,8 @@ final readonly class PS384 extends RSAPSS
     {
         return 'PS384';
     }
-
     #[Override]
-    protected function getAlgorithm(): string
+    protected function get_algorithm(): string
     {
         return 'sha384';
     }

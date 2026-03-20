@@ -1,26 +1,22 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Component\Encryption\Algorithm\Key_Encryption;
 
-namespace Jose\Component\Encryption\Algorithm\KeyEncryption;
-
-use Jose\Component\Encryption\Algorithm\KeyEncryption\Util\RSACrypt;
+use Jose\Component\Encryption\Algorithm\Key_Encryption\Util\Rsa_Crypt;
 use Override;
-
 final readonly class RSAOAEP256 extends RSA
 {
     #[Override]
-    public function getEncryptionMode(): int
+    public function get_encryption_mode(): int
     {
-        return RSACrypt::ENCRYPTION_OAEP;
+        return Rsa_Crypt::ENCRYPTION_OAEP;
     }
-
     #[Override]
-    public function getHashAlgorithm(): string
+    public function get_hash_algorithm(): string
     {
         return 'sha256';
     }
-
     #[Override]
     public function name(): string
     {

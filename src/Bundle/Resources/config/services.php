@@ -1,17 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
-use Jose\Component\Core\AlgorithmManagerFactory;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-
-return function (ContainerConfigurator $container): void {
-    $container = $container->services()
-        ->defaults()
-        ->private()
-        ->autoconfigure()
-        ->autowire();
-
-    $container->set(AlgorithmManagerFactory::class)
-        ->public();
+declare (strict_types=1);
+use Jose\Component\Core\Algorithm_Manager_Factory;
+use Symfony\Component\Dependency_Injection\Loader\Configurator\Container_Configurator;
+return function (Container_Configurator $container): void {
+    $container = $container->services()->defaults()->private()->autoconfigure()->autowire();
+    $container->set(Algorithm_Manager_Factory::class)->public();
 };

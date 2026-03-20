@@ -1,200 +1,154 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Data_Collector;
 
-namespace Jose\Bundle\JoseFramework\DataCollector;
-
-use Jose\Bundle\JoseFramework\Event\JWEBuiltFailureEvent;
-use Jose\Bundle\JoseFramework\Event\JWEBuiltSuccessEvent;
-use Jose\Bundle\JoseFramework\Event\JWEDecryptionFailureEvent;
-use Jose\Bundle\JoseFramework\Event\JWEDecryptionSuccessEvent;
-use Jose\Component\Encryption\JWEBuilder;
-use Jose\Component\Encryption\JWEDecrypter;
-use Jose\Component\Encryption\JWELoader;
-use Jose\Component\Encryption\Serializer\JWESerializerManagerFactory;
+use Jose\Bundle\Jose_Framework\Event\Jwe_Built_Failure_Event;
+use Jose\Bundle\Jose_Framework\Event\Jwe_Built_Success_Event;
+use Jose\Bundle\Jose_Framework\Event\Jwe_Decryption_Failure_Event;
+use Jose\Bundle\Jose_Framework\Event\Jwe_Decryption_Success_Event;
+use Jose\Component\Encryption\Jwe_Builder;
+use Jose\Component\Encryption\Jwe_Decrypter;
+use Jose\Component\Encryption\Jwe_Loader;
+use Jose\Component\Encryption\Serializer\Jwe_Serializer_Manager_Factory;
 use Override;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\VarDumper\Cloner\Data;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\Event_Dispatcher\Event_Subscriber_Interface;
+use Symfony\Component\Http_Foundation\Request;
+use Symfony\Component\Http_Foundation\Response;
+use Symfony\Component\Var_Dumper\Cloner\Data;
+use Symfony\Component\Var_Dumper\Cloner\Var_Cloner;
 use Throwable;
-
-final class JWECollector implements Collector, EventSubscriberInterface
+final class Jwe_Collector implements Collector, Event_Subscriber_Interface
 {
     /**
      * @var array<Data>
      */
-    private array $jweDecryptionSuccesses = [];
-
+    private array $jwe_decryption_successes = [];
     /**
      * @var array<Data>
      */
-    private array $jweDecryptionFailures = [];
-
+    private array $jwe_decryption_failures = [];
     /**
      * @var array<Data>
      */
-    private array $jweBuiltSuccesses = [];
-
+    private array $jwe_built_successes = [];
     /**
      * @var array<Data>
      */
-    private array $jweBuiltFailures = [];
-
+    private array $jwe_built_failures = [];
     /**
      * @var array<JWEBuilder>
      */
-    private array $jweBuilders = [];
-
+    private array $jwe_builders = [];
     /**
      * @var array<JWEDecrypter>
      */
-    private array $jweDecrypters = [];
-
+    private array $jwe_decrypters = [];
     /**
      * @var array<JWELoader>
      */
-    private array $jweLoaders = [];
-
-    public function __construct(
-        private readonly ?JWESerializerManagerFactory $jweSerializerManagerFactory = null
-    ) {
+    private array $jwe_loaders = [];
+    public function __construct(private readonly ?Jwe_Serializer_Manager_Factory $jwe_serializer_manager_factory = null)
+    {
     }
-
     /**
      * @param array<string, mixed> $data
      */
     #[Override]
     public function collect(array &$data, Request $request, Response $response, ?Throwable $exception = null): void
     {
-        $this->collectSupportedJWESerializations($data);
-        $this->collectSupportedJWEBuilders($data);
-        $this->collectSupportedJWEDecrypters($data);
-        $this->collectSupportedJWELoaders($data);
-        $this->collectEvents($data);
+        $this->collect_supported_jwe_serializations($data);
+        $this->collect_supported_jwe_builders($data);
+        $this->collect_supported_jwe_decrypters($data);
+        $this->collect_supported_jwe_loaders($data);
+        $this->collect_events($data);
     }
-
-    public function addJWEBuilder(string $id, JWEBuilder $jweBuilder): void
+    public function add_jwe_builder(string $id, Jwe_Builder $jwe_builder): void
     {
-        $this->jweBuilders[$id] = $jweBuilder;
+        $this->jwe_builders[$id] = $jwe_builder;
     }
-
-    public function addJWEDecrypter(string $id, JWEDecrypter $jweDecrypter): void
+    public function add_jwe_decrypter(string $id, Jwe_Decrypter $jwe_decrypter): void
     {
-        $this->jweDecrypters[$id] = $jweDecrypter;
+        $this->jwe_decrypters[$id] = $jwe_decrypter;
     }
-
-    public function addJWELoader(string $id, JWELoader $jweLoader): void
+    public function add_jwe_loader(string $id, Jwe_Loader $jwe_loader): void
     {
-        $this->jweLoaders[$id] = $jweLoader;
+        $this->jwe_loaders[$id] = $jwe_loader;
     }
-
     #[Override]
-    public static function getSubscribedEvents(): array
+    public static function get_subscribed_events(): array
     {
-        return [
-            JWEDecryptionSuccessEvent::class => ['catchJweDecryptionSuccess'],
-            JWEDecryptionFailureEvent::class => ['catchJweDecryptionFailure'],
-            JWEBuiltSuccessEvent::class => ['catchJweBuiltSuccess'],
-            JWEBuiltFailureEvent::class => ['catchJweBuiltFailure'],
-        ];
+        return [Jwe_Decryption_Success_Event::class => ['catchJweDecryptionSuccess'], Jwe_Decryption_Failure_Event::class => ['catchJweDecryptionFailure'], Jwe_Built_Success_Event::class => ['catchJweBuiltSuccess'], Jwe_Built_Failure_Event::class => ['catchJweBuiltFailure']];
     }
-
-    public function catchJweDecryptionSuccess(JWEDecryptionSuccessEvent $event): void
+    public function catch_jwe_decryption_success(Jwe_Decryption_Success_Event $event): void
     {
-        $cloner = new VarCloner();
-        $this->jweDecryptionSuccesses[] = $cloner->cloneVar($event);
+        $cloner = new Var_Cloner();
+        $this->jwe_decryption_successes[] = $cloner->clone_var($event);
     }
-
-    public function catchJweDecryptionFailure(JWEDecryptionFailureEvent $event): void
+    public function catch_jwe_decryption_failure(Jwe_Decryption_Failure_Event $event): void
     {
-        $cloner = new VarCloner();
-        $this->jweDecryptionFailures[] = $cloner->cloneVar($event);
+        $cloner = new Var_Cloner();
+        $this->jwe_decryption_failures[] = $cloner->clone_var($event);
     }
-
-    public function catchJweBuiltSuccess(JWEBuiltSuccessEvent $event): void
+    public function catch_jwe_built_success(Jwe_Built_Success_Event $event): void
     {
-        $cloner = new VarCloner();
-        $this->jweBuiltSuccesses[] = $cloner->cloneVar($event);
+        $cloner = new Var_Cloner();
+        $this->jwe_built_successes[] = $cloner->clone_var($event);
     }
-
-    public function catchJweBuiltFailure(JWEBuiltFailureEvent $event): void
+    public function catch_jwe_built_failure(Jwe_Built_Failure_Event $event): void
     {
-        $cloner = new VarCloner();
-        $this->jweBuiltFailures[] = $cloner->cloneVar($event);
+        $cloner = new Var_Cloner();
+        $this->jwe_built_failures[] = $cloner->clone_var($event);
     }
-
     /**
      * @param array<string, array<string, mixed>> $data
      */
-    private function collectSupportedJWESerializations(array &$data): void
+    private function collect_supported_jwe_serializations(array &$data): void
     {
         $data['jwe']['jwe_serialization'] = [];
-        if ($this->jweSerializerManagerFactory === null) {
+        if ($this->jwe_serializer_manager_factory === null) {
             return;
         }
-        $serializers = $this->jweSerializerManagerFactory->all();
+        $serializers = $this->jwe_serializer_manager_factory->all();
         foreach ($serializers as $serializer) {
-            $data['jwe']['jwe_serialization'][$serializer->name()] = $serializer->displayName();
+            $data['jwe']['jwe_serialization'][$serializer->name()] = $serializer->display_name();
         }
     }
-
     /**
      * @param array<string, array<string, mixed>> $data
      */
-    private function collectSupportedJWEBuilders(array &$data): void
+    private function collect_supported_jwe_builders(array &$data): void
     {
         $data['jwe']['jwe_builders'] = [];
-        foreach ($this->jweBuilders as $id => $jweBuilder) {
-            $data['jwe']['jwe_builders'][$id] = [
-                'encryption_algorithms' => $jweBuilder->getKeyEncryptionAlgorithmManager()
-                    ->list(),
-            ];
+        foreach ($this->jwe_builders as $id => $jwe_builder) {
+            $data['jwe']['jwe_builders'][$id] = ['encryption_algorithms' => $jwe_builder->get_key_encryption_algorithm_manager()->list()];
         }
     }
-
     /**
      * @param array<string, array<string, mixed>> $data
      */
-    private function collectSupportedJWEDecrypters(array &$data): void
+    private function collect_supported_jwe_decrypters(array &$data): void
     {
         $data['jwe']['jwe_decrypters'] = [];
-        foreach ($this->jweDecrypters as $id => $jweDecrypter) {
-            $data['jwe']['jwe_decrypters'][$id] = [
-                'encryption_algorithms' => $jweDecrypter->getKeyEncryptionAlgorithmManager()
-                    ->list(),
-            ];
+        foreach ($this->jwe_decrypters as $id => $jwe_decrypter) {
+            $data['jwe']['jwe_decrypters'][$id] = ['encryption_algorithms' => $jwe_decrypter->get_key_encryption_algorithm_manager()->list()];
         }
     }
-
     /**
      * @param array<string, array<string, mixed>> $data
      */
-    private function collectSupportedJWELoaders(array &$data): void
+    private function collect_supported_jwe_loaders(array &$data): void
     {
         $data['jwe']['jwe_loaders'] = [];
-        foreach ($this->jweLoaders as $id => $jweLoader) {
-            $data['jwe']['jwe_loaders'][$id] = [
-                'serializers' => $jweLoader->getSerializerManager()
-                    ->names(),
-                'encryption_algorithms' => $jweLoader->getJweDecrypter()
-                    ->getKeyEncryptionAlgorithmManager()
-                    ->list(),
-            ];
+        foreach ($this->jwe_loaders as $id => $jwe_loader) {
+            $data['jwe']['jwe_loaders'][$id] = ['serializers' => $jwe_loader->get_serializer_manager()->names(), 'encryption_algorithms' => $jwe_loader->get_jwe_decrypter()->get_key_encryption_algorithm_manager()->list()];
         }
     }
-
     /**
      * @param array<string, array<string, mixed>> $data
      */
-    private function collectEvents(array &$data): void
+    private function collect_events(array &$data): void
     {
-        $data['jwe']['events'] = [
-            'decryption_success' => $this->jweDecryptionSuccesses,
-            'decryption_failure' => $this->jweDecryptionFailures,
-            'built_success' => $this->jweBuiltSuccesses,
-            'built_failure' => $this->jweBuiltFailures,
-        ];
+        $data['jwe']['events'] = ['decryption_success' => $this->jwe_decryption_successes, 'decryption_failure' => $this->jwe_decryption_failures, 'built_success' => $this->jwe_built_successes, 'built_failure' => $this->jwe_built_failures];
     }
 }

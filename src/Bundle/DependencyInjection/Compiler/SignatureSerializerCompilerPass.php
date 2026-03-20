@@ -1,29 +1,25 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection\Compiler;
 
-namespace Jose\Bundle\JoseFramework\DependencyInjection\Compiler;
-
-use Jose\Component\Signature\Serializer\JWSSerializerManagerFactory;
+use Jose\Component\Signature\Serializer\Jws_Serializer_Manager_Factory;
 use Override;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
-
-final readonly class SignatureSerializerCompilerPass implements CompilerPassInterface
+use Symfony\Component\Dependency_Injection\Compiler\Compiler_Pass_Interface;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+use Symfony\Component\Dependency_Injection\Reference;
+final readonly class Signature_Serializer_Compiler_Pass implements Compiler_Pass_Interface
 {
     #[Override]
-    public function process(ContainerBuilder $container): void
+    public function process(Container_Builder $container): void
     {
-        if (! $container->hasDefinition(JWSSerializerManagerFactory::class)) {
+        if (!$container->has_definition(Jws_Serializer_Manager_Factory::class)) {
             return;
         }
-
-        $definition = $container->getDefinition(JWSSerializerManagerFactory::class);
-
-        $taggedAlgorithmServices = $container->findTaggedServiceIds('jose.jws.serializer');
-        foreach ($taggedAlgorithmServices as $id => $tags) {
-            $definition->addMethodCall('add', [new Reference($id)]);
+        $definition = $container->get_definition(Jws_Serializer_Manager_Factory::class);
+        $tagged_algorithm_services = $container->find_tagged_service_ids('jose.jws.serializer');
+        foreach ($tagged_algorithm_services as $id => $tags) {
+            $definition->add_method_call('add', [new Reference($id)]);
         }
     }
 }

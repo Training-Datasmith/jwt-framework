@@ -1,32 +1,24 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Event;
 
-namespace Jose\Bundle\JoseFramework\Event;
-
-use Symfony\Contracts\EventDispatcher\Event;
-
-final class ClaimCheckedSuccessEvent extends Event
+use Symfony\Contracts\Event_Dispatcher\Event;
+final class Claim_Checked_Success_Event extends Event
 {
-    public function __construct(
-        private readonly array $claims,
-        private readonly array $mandatoryClaims,
-        private readonly array $checkedClaims
-    ) {
+    public function __construct(private readonly array $claims, private readonly array $mandatory_claims, private readonly array $checked_claims)
+    {
     }
-
-    public function getClaims(): array
+    public function get_claims(): array
     {
         return $this->claims;
     }
-
-    public function getMandatoryClaims(): array
+    public function get_mandatory_claims(): array
     {
-        return $this->mandatoryClaims;
+        return $this->mandatory_claims;
     }
-
-    public function getCheckedClaims(): array
+    public function get_checked_claims(): array
     {
-        return $this->checkedClaims;
+        return $this->checked_claims;
     }
 }

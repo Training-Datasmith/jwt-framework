@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Encryption\Algorithm;
 
 use Jose\Component\Core\Algorithm;
-
-interface ContentEncryptionAlgorithm extends Algorithm
+interface Content_Encryption_Algorithm extends Algorithm
 {
     /**
      * This method encrypts the data using the given CEK, IV, AAD and protected header. The variable $tag is populated
@@ -19,15 +17,7 @@ interface ContentEncryptionAlgorithm extends Algorithm
      * @param string $encoded_protected_header The Protected Header encoded in Base64Url
      * @param string $tag Tag
      */
-    public function encryptContent(
-        string $data,
-        string $cek,
-        string $iv,
-        ?string $aad,
-        string $encoded_protected_header,
-        ?string &$tag = null
-    ): string;
-
+    public function encrypt_content(string $data, string $cek, string $iv, ?string $aad, string $encoded_protected_header, ?string &$tag = null): string;
     /**
      * This method tries to decrypt the data using the given CEK, IV, AAD, protected header and tag.
      *
@@ -38,22 +28,13 @@ interface ContentEncryptionAlgorithm extends Algorithm
      * @param string $encoded_protected_header The Protected Header encoded in Base64Url
      * @param string $tag Tag
      */
-    public function decryptContent(
-        string $data,
-        string $cek,
-        string $iv,
-        ?string $aad,
-        string $encoded_protected_header,
-        string $tag
-    ): string;
-
+    public function decrypt_content(string $data, string $cek, string $iv, ?string $aad, string $encoded_protected_header, string $tag): string;
     /**
      * Returns the size of the IV used by this encryption method.
      */
-    public function getIVSize(): int;
-
+    public function get_iv_size(): int;
     /**
      * Returns the size of the CEK used by this encryption method.
      */
-    public function getCEKSize(): int;
+    public function get_cek_size(): int;
 }

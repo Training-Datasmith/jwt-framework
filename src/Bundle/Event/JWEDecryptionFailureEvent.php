@@ -1,27 +1,21 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Event;
 
-namespace Jose\Bundle\JoseFramework\Event;
-
-use Jose\Component\Core\JWKSet;
+use Jose\Component\Core\Jwk_Set;
 use Jose\Component\Encryption\JWE;
-use Symfony\Contracts\EventDispatcher\Event;
-
-final class JWEDecryptionFailureEvent extends Event
+use Symfony\Contracts\Event_Dispatcher\Event;
+final class Jwe_Decryption_Failure_Event extends Event
 {
-    public function __construct(
-        private readonly JWE $jwe,
-        private readonly JWKSet $JWKSet
-    ) {
-    }
-
-    public function getJWKSet(): JWKSet
+    public function __construct(private readonly JWE $jwe, private readonly Jwk_Set $jwk_set)
     {
-        return $this->JWKSet;
     }
-
-    public function getJwe(): JWE
+    public function get_jwk_set(): Jwk_Set
+    {
+        return $this->jwk_set;
+    }
+    public function get_jwe(): JWE
     {
         return $this->jwe;
     }

@@ -1,43 +1,32 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Services;
 
-namespace Jose\Bundle\JoseFramework\Services;
-
-use Jose\Bundle\JoseFramework\Event\JWEDecryptionFailureEvent;
-use Jose\Bundle\JoseFramework\Event\JWEDecryptionSuccessEvent;
-use Jose\Component\Core\AlgorithmManager;
+use Jose\Bundle\Jose_Framework\Event\Jwe_Decryption_Failure_Event;
+use Jose\Bundle\Jose_Framework\Event\Jwe_Decryption_Success_Event;
+use Jose\Component\Core\Algorithm_Manager;
 use Jose\Component\Core\JWK;
-use Jose\Component\Core\JWKSet;
+use Jose\Component\Core\Jwk_Set;
 use Jose\Component\Encryption\JWE;
-use Jose\Component\Encryption\JWEDecrypter as BaseJWEDecrypter;
+use Jose\Component\Encryption\Jwe_Decrypter as BaseJWEDecrypter;
 use Override;
-use Psr\EventDispatcher\EventDispatcherInterface;
-
-final class JWEDecrypter extends BaseJWEDecrypter
+use Psr\Event_Dispatcher\Event_Dispatcher_Interface;
+final class Jwe_Decrypter extends Base_Jwe_Decrypter
 {
-    public function __construct(
-        AlgorithmManager $algorithmManager,
-        private readonly EventDispatcherInterface $eventDispatcher
-    ) {
-        parent::__construct($algorithmManager);
+    public function __construct(Algorithm_Manager $algorithm_manager, private readonly Event_Dispatcher_Interface $event_dispatcher)
+    {
+        parent::__construct($algorithm_manager);
     }
-
     #[Override]
-    public function decryptUsingKeySet(
-        JWE &$jwe,
-        JWKSet $jwkset,
-        int $recipient,
-        ?JWK &$jwk = null,
-        ?JWK $senderKey = null
-    ): bool {
-        $success = parent::decryptUsingKeySet($jwe, $jwkset, $recipient, $jwk, $senderKey);
+    public function decrypt_using_key_set(JWE &$jwe, Jwk_Set $jwkset, int $recipient, ?JWK &$jwk = null, ?JWK $sender_key = null): bool
+    {
+        $success = parent::decrypt_using_key_set($jwe, $jwkset, $recipient, $jwk, $sender_key);
         if ($success) {
-            $this->eventDispatcher->dispatch(new JWEDecryptionSuccessEvent($jwe, $jwkset, $jwk, $recipient));
+            $this->event_dispatcher->dispatch(new Jwe_Decryption_Success_Event($jwe, $jwkset, $jwk, $recipient));
         } else {
-            $this->eventDispatcher->dispatch(new JWEDecryptionFailureEvent($jwe, $jwkset));
+            $this->event_dispatcher->dispatch(new Jwe_Decryption_Failure_Event($jwe, $jwkset));
         }
-
         return $success;
     }
 }

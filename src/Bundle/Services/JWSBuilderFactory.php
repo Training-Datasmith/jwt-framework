@@ -1,29 +1,23 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Services;
 
-namespace Jose\Bundle\JoseFramework\Services;
-
-use Jose\Component\Core\AlgorithmManagerFactory;
-use Psr\EventDispatcher\EventDispatcherInterface;
-
-final readonly class JWSBuilderFactory
+use Jose\Component\Core\Algorithm_Manager_Factory;
+use Psr\Event_Dispatcher\Event_Dispatcher_Interface;
+final readonly class Jws_Builder_Factory
 {
-    public function __construct(
-        private readonly AlgorithmManagerFactory $signatureAlgorithmManagerFactory,
-        private readonly EventDispatcherInterface $eventDispatcher
-    ) {
+    public function __construct(private readonly Algorithm_Manager_Factory $signature_algorithm_manager_factory, private readonly Event_Dispatcher_Interface $event_dispatcher)
+    {
     }
-
     /**
      * This method creates a JWSBuilder using the given algorithm aliases.
      *
      * @param string[] $algorithms
      */
-    public function create(array $algorithms): JWSBuilder
+    public function create(array $algorithms): Jws_Builder
     {
-        $algorithmManager = $this->signatureAlgorithmManagerFactory->create($algorithms);
-
-        return new JWSBuilder($algorithmManager, $this->eventDispatcher);
+        $algorithm_manager = $this->signature_algorithm_manager_factory->create($algorithms);
+        return new Jws_Builder($algorithm_manager, $this->event_dispatcher);
     }
 }

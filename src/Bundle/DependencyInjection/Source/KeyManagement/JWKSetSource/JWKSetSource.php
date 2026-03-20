@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Key_Management\Jwk_Set_Source;
 
-namespace Jose\Bundle\JoseFramework\DependencyInjection\Source\KeyManagement\JWKSetSource;
-
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-interface JWKSetSource
+use Symfony\Component\Config\Definition\Builder\Node_Definition;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+interface Jwk_Set_Source
 {
     /**
      * Creates the JWKSet, registers it and returns its id.
@@ -17,15 +15,13 @@ interface JWKSetSource
      * @param string $id The id of the service
      * @param array<string, mixed> $config An array of configuration
      */
-    public function create(ContainerBuilder $container, string $type, string $id, array $config): void;
-
+    public function create(Container_Builder $container, string $type, string $id, array $config): void;
     /**
      * Returns the key set for the Key Set Source configuration.
      */
-    public function getKeySet(): string;
-
+    public function get_key_set(): string;
     /**
      * Adds configuration nodes for this service.
      */
-    public function addConfiguration(NodeDefinition $builder): void;
+    public function add_configuration(Node_Definition $builder): void;
 }

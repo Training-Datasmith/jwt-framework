@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Component\Encryption\Algorithm\Key_Encryption;
 
-namespace Jose\Component\Encryption\Algorithm\KeyEncryption;
-
-use Jose\Component\Encryption\Algorithm\KeyEncryption\Util\RSACrypt;
+use Jose\Component\Encryption\Algorithm\Key_Encryption\Util\Rsa_Crypt;
 use Override;
-
 final readonly class RSAOAEP extends RSA
 {
     #[Override]
@@ -14,15 +12,13 @@ final readonly class RSAOAEP extends RSA
     {
         return 'RSA-OAEP';
     }
-
     #[Override]
-    protected function getEncryptionMode(): int
+    protected function get_encryption_mode(): int
     {
-        return RSACrypt::ENCRYPTION_OAEP;
+        return Rsa_Crypt::ENCRYPTION_OAEP;
     }
-
     #[Override]
-    protected function getHashAlgorithm(): string
+    protected function get_hash_algorithm(): string
     {
         return 'sha1';
     }

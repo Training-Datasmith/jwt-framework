@@ -1,16 +1,14 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Controller;
 
-namespace Jose\Bundle\JoseFramework\Controller;
-
-use Jose\Component\Core\JWKSet;
-use Jose\Component\Core\Util\JsonConverter;
-
-final readonly class JWKSetControllerFactory
+use Jose\Component\Core\Jwk_Set;
+use Jose\Component\Core\Util\Json_Converter;
+final readonly class Jwk_Set_Controller_Factory
 {
-    public function create(JWKSet $jwkset): JWKSetController
+    public function create(Jwk_Set $jwkset): Jwk_Set_Controller
     {
-        return new JWKSetController(JsonConverter::encode($jwkset));
+        return new Jwk_Set_Controller(Json_Converter::encode($jwkset));
     }
 }

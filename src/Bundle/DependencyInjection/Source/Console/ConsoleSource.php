@@ -1,39 +1,34 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Console;
 
-namespace Jose\Bundle\JoseFramework\DependencyInjection\Source\Console;
-
-use Jose\Bundle\JoseFramework\DependencyInjection\Source\Source;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Source;
 use Override;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-
-final readonly class ConsoleSource implements Source
+use Symfony\Component\Config\Definition\Builder\Node_Definition;
+use Symfony\Component\Config\File_Locator;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+use Symfony\Component\Dependency_Injection\Loader\Php_File_Loader;
+final readonly class Console_Source implements Source
 {
     #[Override]
     public function name(): string
     {
         return 'console';
     }
-
     #[Override]
-    public function load(array $configs, ContainerBuilder $container): void
+    public function load(array $configs, Container_Builder $container): void
     {
-        $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../../Resources/config'));
+        $loader = new Php_File_Loader($container, new File_Locator(__DIR__ . '/../../../Resources/config'));
         $loader->load('commands.php');
     }
-
     #[Override]
-    public function getNodeDefinition(NodeDefinition $node): void
+    public function get_node_definition(Node_Definition $node): void
     {
         // No configuration needed
     }
-
     #[Override]
-    public function prepend(ContainerBuilder $container, array $config): array
+    public function prepend(Container_Builder $container, array $config): array
     {
         return [];
     }

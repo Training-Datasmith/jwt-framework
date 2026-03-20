@@ -1,68 +1,48 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Jose\Bundle\JoseFramework\Serializer;
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Serializer;
 
 use function in_array;
-
 use Jose\Component\Signature\JWS;
-use Jose\Component\Signature\Serializer\JWSSerializerManager;
-use Jose\Component\Signature\Serializer\JWSSerializerManagerFactory;
+use Jose\Component\Signature\Serializer\Jws_Serializer_Manager;
+use Jose\Component\Signature\Serializer\Jws_Serializer_Manager_Factory;
 use LogicException;
 use Override;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-
-final readonly class JWSSerializer implements DenormalizerInterface
+use Symfony\Component\Serializer\Normalizer\Denormalizer_Interface;
+final readonly class Jws_Serializer implements Denormalizer_Interface
 {
-    private readonly JWSSerializerManager $serializerManager;
-
-    public function __construct(
-        JWSSerializerManagerFactory $serializerManagerFactory,
-        ?JWSSerializerManager $serializerManager = null
-    ) {
-        if ($serializerManager === null) {
-            $serializerManager = $serializerManagerFactory->create($serializerManagerFactory->names());
-        }
-        $this->serializerManager = $serializerManager;
-    }
-
-    #[Override]
-    public function getSupportedTypes(?string $format): array
+    private readonly Jws_Serializer_Manager $serializer_manager;
+    public function __construct(Jws_Serializer_Manager_Factory $serializer_manager_factory, ?Jws_Serializer_Manager $serializer_manager = null)
     {
-        return [
-            JWS::class => class_exists(JWSSerializerManager::class) && $this->formatSupported($format),
-        ];
+        if ($serializer_manager === null) {
+            $serializer_manager = $serializer_manager_factory->create($serializer_manager_factory->names());
+        }
+        $this->serializer_manager = $serializer_manager;
     }
-
     #[Override]
-    public function supportsDenormalization(
-        mixed $data,
-        string $type,
-        ?string $format = null,
-        array $context = []
-    ): bool {
-        return $type === JWS::class
-            && class_exists(JWSSerializerManager::class)
-            && $this->formatSupported($format);
+    public function get_supported_types(?string $format): array
+    {
+        return [JWS::class => class_exists(Jws_Serializer_Manager::class) && $this->format_supported($format)];
     }
-
+    #[Override]
+    public function supports_denormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
+    {
+        return $type === JWS::class && class_exists(Jws_Serializer_Manager::class) && $this->format_supported($format);
+    }
     #[Override]
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): JWS
     {
         if ($data instanceof JWS === false) {
             throw new LogicException('Expected data to be a JWS.');
         }
-
         return $data;
     }
-
     /**
      * Check if format is supported.
      */
-    private function formatSupported(?string $format): bool
+    private function format_supported(?string $format): bool
     {
-        return $format !== null
-            && in_array(strtolower($format), $this->serializerManager->list(), true);
+        return $format !== null && in_array(strtolower($format), $this->serializer_manager->list(), true);
     }
 }

@@ -1,55 +1,42 @@
 <?php
 
-declare(strict_types=1);
-
-use Jose\Component\Core\Util\Ecc\NistCurve;
-use Jose\Component\KeyManagement\Analyzer\AlgorithmAnalyzer;
-use Jose\Component\KeyManagement\Analyzer\ES256KeyAnalyzer;
-use Jose\Component\KeyManagement\Analyzer\ES384KeyAnalyzer;
-use Jose\Component\KeyManagement\Analyzer\ES512KeyAnalyzer;
-use Jose\Component\KeyManagement\Analyzer\HS256KeyAnalyzer;
-use Jose\Component\KeyManagement\Analyzer\HS384KeyAnalyzer;
-use Jose\Component\KeyManagement\Analyzer\HS512KeyAnalyzer;
-use Jose\Component\KeyManagement\Analyzer\KeyAnalyzerManager;
-use Jose\Component\KeyManagement\Analyzer\KeyIdentifierAnalyzer;
-use Jose\Component\KeyManagement\Analyzer\KeysetAnalyzerManager;
-use Jose\Component\KeyManagement\Analyzer\MixedKeyTypes;
-use Jose\Component\KeyManagement\Analyzer\MixedPublicAndPrivateKeys;
-use Jose\Component\KeyManagement\Analyzer\NoneAnalyzer;
-use Jose\Component\KeyManagement\Analyzer\OctAnalyzer;
-use Jose\Component\KeyManagement\Analyzer\UsageAnalyzer;
-use Jose\Component\KeyManagement\Analyzer\ZxcvbnKeyAnalyzer;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-
-return function (ContainerConfigurator $container): void {
-    $container = $container->services()
-        ->defaults()
-        ->private()
-        ->autoconfigure()
-        ->autowire();
-
-    $container->set(KeyAnalyzerManager::class)
-        ->public();
-
-    $container->set(KeysetAnalyzerManager::class)
-        ->public();
-
-    $container->set(AlgorithmAnalyzer::class);
-    $container->set(UsageAnalyzer::class);
-    $container->set(KeyIdentifierAnalyzer::class);
-    $container->set(NoneAnalyzer::class);
-    $container->set(OctAnalyzer::class);
-    $container->set(MixedKeyTypes::class);
-    $container->set(MixedPublicAndPrivateKeys::class);
-    $container->set(HS256KeyAnalyzer::class);
-    $container->set(HS384KeyAnalyzer::class);
-    $container->set(HS512KeyAnalyzer::class);
-
-    if (class_exists(NistCurve::class)) {
-        $container->set(ES256KeyAnalyzer::class);
-        $container->set(ES384KeyAnalyzer::class);
-        $container->set(ES512KeyAnalyzer::class);
+declare (strict_types=1);
+use Jose\Component\Core\Util\Ecc\Nist_Curve;
+use Jose\Component\Key_Management\Analyzer\Algorithm_Analyzer;
+use Jose\Component\Key_Management\Analyzer\Es256key_Analyzer;
+use Jose\Component\Key_Management\Analyzer\Es384key_Analyzer;
+use Jose\Component\Key_Management\Analyzer\Es512key_Analyzer;
+use Jose\Component\Key_Management\Analyzer\Hs256key_Analyzer;
+use Jose\Component\Key_Management\Analyzer\Hs384key_Analyzer;
+use Jose\Component\Key_Management\Analyzer\Hs512key_Analyzer;
+use Jose\Component\Key_Management\Analyzer\Key_Analyzer_Manager;
+use Jose\Component\Key_Management\Analyzer\Key_Identifier_Analyzer;
+use Jose\Component\Key_Management\Analyzer\Keyset_Analyzer_Manager;
+use Jose\Component\Key_Management\Analyzer\Mixed_Key_Types;
+use Jose\Component\Key_Management\Analyzer\Mixed_Public_And_Private_Keys;
+use Jose\Component\Key_Management\Analyzer\None_Analyzer;
+use Jose\Component\Key_Management\Analyzer\Oct_Analyzer;
+use Jose\Component\Key_Management\Analyzer\Usage_Analyzer;
+use Jose\Component\Key_Management\Analyzer\Zxcvbn_Key_Analyzer;
+use Symfony\Component\Dependency_Injection\Loader\Configurator\Container_Configurator;
+return function (Container_Configurator $container): void {
+    $container = $container->services()->defaults()->private()->autoconfigure()->autowire();
+    $container->set(Key_Analyzer_Manager::class)->public();
+    $container->set(Keyset_Analyzer_Manager::class)->public();
+    $container->set(Algorithm_Analyzer::class);
+    $container->set(Usage_Analyzer::class);
+    $container->set(Key_Identifier_Analyzer::class);
+    $container->set(None_Analyzer::class);
+    $container->set(Oct_Analyzer::class);
+    $container->set(Mixed_Key_Types::class);
+    $container->set(Mixed_Public_And_Private_Keys::class);
+    $container->set(Hs256key_Analyzer::class);
+    $container->set(Hs384key_Analyzer::class);
+    $container->set(Hs512key_Analyzer::class);
+    if (class_exists(Nist_Curve::class)) {
+        $container->set(Es256key_Analyzer::class);
+        $container->set(Es384key_Analyzer::class);
+        $container->set(Es512key_Analyzer::class);
     }
-
-    $container->set(ZxcvbnKeyAnalyzer::class);
+    $container->set(Zxcvbn_Key_Analyzer::class);
 };

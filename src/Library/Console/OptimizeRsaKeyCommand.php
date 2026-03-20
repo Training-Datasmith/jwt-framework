@@ -1,48 +1,42 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Console;
 
 use InvalidArgumentException;
-
 use function is_array;
 use function is_string;
-
 use Jose\Component\Core\JWK;
-use Jose\Component\Core\Util\JsonConverter;
-use Jose\Component\KeyManagement\KeyConverter\RSAKey;
+use Jose\Component\Core\Util\Json_Converter;
+use Jose\Component\Key_Management\Key_Converter\Rsa_Key;
 use Override;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
-#[AsCommand(name: 'key:optimize', description: 'Optimize a RSA key by calculating additional primes (CRT).', )]
-final class OptimizeRsaKeyCommand extends ObjectOutputCommand
+use Symfony\Component\Console\Attribute\As_Command;
+use Symfony\Component\Console\Input\Input_Argument;
+use Symfony\Component\Console\Input\Input_Interface;
+use Symfony\Component\Console\Output\Output_Interface;
+#[As_Command(name: 'key:optimize', description: 'Optimize a RSA key by calculating additional primes (CRT).')]
+final class Optimize_Rsa_Key_Command extends Object_Output_Command
 {
     #[Override]
     protected function configure(): void
     {
         parent::configure();
-        $this->addArgument('jwk', InputArgument::REQUIRED, 'The RSA key.');
+        $this->add_argument('jwk', Input_Argument::REQUIRED, 'The RSA key.');
     }
-
     #[Override]
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(Input_Interface $input, Output_Interface $output): int
     {
-        $jwk = $input->getArgument('jwk');
-        if (! is_string($jwk)) {
+        $jwk = $input->get_argument('jwk');
+        if (!is_string($jwk)) {
             throw new InvalidArgumentException('Invalid JWK');
         }
-        $json = JsonConverter::decode($jwk);
-        if (! is_array($json)) {
+        $json = Json_Converter::decode($jwk);
+        if (!is_array($json)) {
             throw new InvalidArgumentException('Invalid JWK');
         }
-        $key = RSAKey::createFromJWK(new JWK($json));
+        $key = Rsa_Key::create_from_jwk(new JWK($json));
         $key->optimize();
-        $this->prepareJsonOutput($input, $output, $key->toJwk());
-
+        $this->prepare_json_output($input, $output, $key->to_jwk());
         return self::SUCCESS;
     }
 }

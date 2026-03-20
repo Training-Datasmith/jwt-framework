@@ -1,26 +1,16 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Controller;
 
-namespace Jose\Bundle\JoseFramework\Controller;
-
-use Symfony\Component\HttpFoundation\Response;
-
-final readonly class JWKSetController
+use Symfony\Component\Http_Foundation\Response;
+final readonly class Jwk_Set_Controller
 {
-    public function __construct(
-        private string $jwkset
-    ) {
+    public function __construct(private string $jwkset)
+    {
     }
-
     public function __invoke(): Response
     {
-        return new Response(
-            $this->jwkset,
-            Response::HTTP_OK,
-            [
-                'Content-Type' => 'application/jwk-set+json; charset=UTF-8',
-            ]
-        );
+        return new Response($this->jwkset, Response::HTTP_OK, ['Content-Type' => 'application/jwk-set+json; charset=UTF-8']);
     }
 }

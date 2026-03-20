@@ -1,20 +1,16 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Event;
 
-namespace Jose\Bundle\JoseFramework\Event;
-
-use Symfony\Contracts\EventDispatcher\Event;
-
-final class NestedTokenIssuedEvent extends Event
+use Symfony\Contracts\Event_Dispatcher\Event;
+final class Nested_Token_Issued_Event extends Event
 {
-    public function __construct(
-        private readonly string $nestedToken
-    ) {
-    }
-
-    public function getNestedToken(): string
+    public function __construct(private readonly string $nested_token)
     {
-        return $this->nestedToken;
+    }
+    public function get_nested_token(): string
+    {
+        return $this->nested_token;
     }
 }

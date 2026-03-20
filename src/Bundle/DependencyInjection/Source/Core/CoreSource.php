@@ -1,74 +1,59 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Core;
 
-namespace Jose\Bundle\JoseFramework\DependencyInjection\Source\Core;
-
-use Jose\Bundle\JoseFramework\DataCollector\Collector;
-use Jose\Bundle\JoseFramework\DependencyInjection\Compiler\AlgorithmCompilerPass;
-use Jose\Bundle\JoseFramework\DependencyInjection\Compiler\CheckerCollectorCompilerPass;
-use Jose\Bundle\JoseFramework\DependencyInjection\Compiler\DataCollectorCompilerPass;
-use Jose\Bundle\JoseFramework\DependencyInjection\Compiler\JWECollectorCompilerPass;
-use Jose\Bundle\JoseFramework\DependencyInjection\Compiler\JWSCollectorCompilerPass;
-use Jose\Bundle\JoseFramework\DependencyInjection\Compiler\KeyCollectorCompilerPass;
-use Jose\Bundle\JoseFramework\DependencyInjection\Source\SourceWithCompilerPasses;
+use Jose\Bundle\Jose_Framework\Data_Collector\Collector;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Compiler\Algorithm_Compiler_Pass;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Compiler\Checker_Collector_Compiler_Pass;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Compiler\Data_Collector_Compiler_Pass;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Compiler\Jwe_Collector_Compiler_Pass;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Compiler\Jws_Collector_Compiler_Pass;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Compiler\Key_Collector_Compiler_Pass;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Source_With_Compiler_Passes;
 use Override;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-
-final readonly class CoreSource implements SourceWithCompilerPasses
+use Symfony\Component\Config\Definition\Builder\Node_Definition;
+use Symfony\Component\Config\File_Locator;
+use Symfony\Component\Dependency_Injection\Compiler\Compiler_Pass_Interface;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+use Symfony\Component\Dependency_Injection\Env_Var_Processor_Interface;
+use Symfony\Component\Dependency_Injection\Loader\Php_File_Loader;
+final readonly class Core_Source implements Source_With_Compiler_Passes
 {
     #[Override]
     public function name(): string
     {
         return 'core';
     }
-
     #[Override]
-    public function load(array $config, ContainerBuilder $container): void
+    public function load(array $config, Container_Builder $container): void
     {
-        $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../../Resources/config'));
+        $loader = new Php_File_Loader($container, new File_Locator(__DIR__ . '/../../../Resources/config'));
         $loader->load('services.php');
-
-        if (interface_exists(EnvVarProcessorInterface::class)) {
+        if (interface_exists(Env_Var_Processor_Interface::class)) {
             $loader->load('env_var.php');
         }
-
-        if ($container->getParameter('kernel.debug') === true) {
-            $container->registerForAutoconfiguration(Collector::class)->addTag('jose.data_collector');
+        if ($container->get_parameter('kernel.debug') === true) {
+            $container->register_for_autoconfiguration(Collector::class)->add_tag('jose.data_collector');
             $loader->load('dev_services.php');
         }
     }
-
     #[Override]
-    public function getNodeDefinition(NodeDefinition $node): void
+    public function get_node_definition(Node_Definition $node): void
     {
         // No configuration needed
     }
-
     #[Override]
-    public function prepend(ContainerBuilder $container, array $config): array
+    public function prepend(Container_Builder $container, array $config): array
     {
         return [];
     }
-
     /**
      * @return CompilerPassInterface[]
      */
     #[Override]
-    public function getCompilerPasses(): array
+    public function get_compiler_passes(): array
     {
-        return [
-            new AlgorithmCompilerPass(),
-            new DataCollectorCompilerPass(),
-            new CheckerCollectorCompilerPass(),
-            new KeyCollectorCompilerPass(),
-            new JWSCollectorCompilerPass(),
-            new JWECollectorCompilerPass(),
-        ];
+        return [new Algorithm_Compiler_Pass(), new Data_Collector_Compiler_Pass(), new Checker_Collector_Compiler_Pass(), new Key_Collector_Compiler_Pass(), new Jws_Collector_Compiler_Pass(), new Jwe_Collector_Compiler_Pass()];
     }
 }

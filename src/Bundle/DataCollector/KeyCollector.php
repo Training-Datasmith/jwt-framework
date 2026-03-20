@@ -1,96 +1,78 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Jose\Bundle\JoseFramework\DataCollector;
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Data_Collector;
 
 use Jose\Component\Core\JWK;
-use Jose\Component\Core\JWKSet;
-use Jose\Component\KeyManagement\Analyzer\KeyAnalyzerManager;
-use Jose\Component\KeyManagement\Analyzer\KeysetAnalyzerManager;
-use Jose\Component\KeyManagement\Analyzer\MessageBag;
+use Jose\Component\Core\Jwk_Set;
+use Jose\Component\Key_Management\Analyzer\Key_Analyzer_Manager;
+use Jose\Component\Key_Management\Analyzer\Keyset_Analyzer_Manager;
+use Jose\Component\Key_Management\Analyzer\Message_Bag;
 use Override;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
+use Symfony\Component\Http_Foundation\Request;
+use Symfony\Component\Http_Foundation\Response;
+use Symfony\Component\Var_Dumper\Cloner\Var_Cloner;
 use Throwable;
-
-final class KeyCollector implements Collector
+final class Key_Collector implements Collector
 {
     /**
      * @var array<JWK>
      */
     private array $jwks = [];
-
     /**
      * @var array<JWKSet>
      */
     private array $jwksets = [];
-
-    public function __construct(
-        private readonly ?KeyAnalyzerManager $jwkAnalyzerManager = null,
-        private readonly ?KeysetAnalyzerManager $jwksetAnalyzerManager = null
-    ) {
+    public function __construct(private readonly ?Key_Analyzer_Manager $jwk_analyzer_manager = null, private readonly ?Keyset_Analyzer_Manager $jwkset_analyzer_manager = null)
+    {
     }
-
     /**
      * @param array<string, mixed> $data
      */
     #[Override]
     public function collect(array &$data, Request $request, Response $response, ?Throwable $exception = null): void
     {
-        $this->collectJWK($data);
-        $this->collectJWKSet($data);
+        $this->collect_jwk($data);
+        $this->collect_jwk_set($data);
     }
-
-    public function addJWK(string $id, JWK $jwk): void
+    public function add_jwk(string $id, JWK $jwk): void
     {
         $this->jwks[$id] = $jwk;
     }
-
-    public function addJWKSet(string $id, JWKSet $jwkset): void
+    public function add_jwk_set(string $id, Jwk_Set $jwkset): void
     {
         $this->jwksets[$id] = $jwkset;
     }
-
     /**
      * @param array<string, array<string, mixed>> $data
      */
-    private function collectJWK(array &$data): void
+    private function collect_jwk(array &$data): void
     {
-        $cloner = new VarCloner();
+        $cloner = new Var_Cloner();
         $data['key']['jwk'] = [];
         foreach ($this->jwks as $id => $jwk) {
-            $data['key']['jwk'][$id] = [
-                'jwk' => $cloner->cloneVar($jwk),
-                'analyze' => $this->jwkAnalyzerManager === null ? [] : $this->jwkAnalyzerManager->analyze($jwk),
-            ];
+            $data['key']['jwk'][$id] = ['jwk' => $cloner->clone_var($jwk), 'analyze' => $this->jwk_analyzer_manager === null ? [] : $this->jwk_analyzer_manager->analyze($jwk)];
         }
     }
-
     /**
      * @param array<string, array<string, mixed>> $data
      */
-    private function collectJWKSet(array &$data): void
+    private function collect_jwk_set(array &$data): void
     {
-        $cloner = new VarCloner();
+        $cloner = new Var_Cloner();
         $data['key']['jwkset'] = [];
         foreach ($this->jwksets as $id => $jwkset) {
             $analyze = [];
-            $analyzeJWKSet = new MessageBag();
-            if ($this->jwkAnalyzerManager !== null) {
+            $analyze_jwk_set = new Message_Bag();
+            if ($this->jwk_analyzer_manager !== null) {
                 foreach ($jwkset as $kid => $jwk) {
-                    $analyze[$kid] = $this->jwkAnalyzerManager->analyze($jwk);
+                    $analyze[$kid] = $this->jwk_analyzer_manager->analyze($jwk);
                 }
             }
-            if ($this->jwksetAnalyzerManager !== null) {
-                $analyzeJWKSet = $this->jwksetAnalyzerManager->analyze($jwkset);
+            if ($this->jwkset_analyzer_manager !== null) {
+                $analyze_jwk_set = $this->jwkset_analyzer_manager->analyze($jwkset);
             }
-            $data['key']['jwkset'][$id] = [
-                'jwkset' => $cloner->cloneVar($jwkset),
-                'analyze' => $analyze,
-                'analyze_jwkset' => $analyzeJWKSet,
-            ];
+            $data['key']['jwkset'][$id] = ['jwkset' => $cloner->clone_var($jwkset), 'analyze' => $analyze, 'analyze_jwkset' => $analyze_jwk_set];
         }
     }
 }

@@ -1,25 +1,18 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Signature\Algorithm\Util;
 
 use function chr;
 use function extension_loaded;
-
 use InvalidArgumentException;
-use Jose\Component\Core\Util\BigInteger;
+use Jose\Component\Core\Util\Big_Integer;
 use Jose\Component\Core\Util\Hash;
-use Jose\Component\Core\Util\RSAKey;
-
+use Jose\Component\Core\Util\Rsa_Key;
 use function ord;
-
 use RuntimeException;
-
 use const STR_PAD_LEFT;
-
 use function strlen;
-
 /**
  * @internal
  */
@@ -29,168 +22,151 @@ final readonly class RSA
      * Probabilistic Signature Scheme.
      */
     public const SIGNATURE_PSS = 1;
-
     /**
      * Use the PKCS#1.
      */
     public const SIGNATURE_PKCS1 = 2;
-
     /**
      * @return non-empty-string
      */
-    public static function sign(RSAKey $key, string $message, string $hash, int $mode): string
+    public static function sign(Rsa_Key $key, string $message, string $hash, int $mode): string
     {
         switch ($mode) {
             case self::SIGNATURE_PSS:
-                return self::signWithPSS($key, $message, $hash);
-
+                return self::sign_with_pss($key, $message, $hash);
             case self::SIGNATURE_PKCS1:
-                if (! extension_loaded('openssl')) {
+                if (!extension_loaded('openssl')) {
                     throw new RuntimeException('Please install the OpenSSL extension');
                 }
-                $result = openssl_sign($message, $signature, $key->toPEM(), $hash);
+                $result = openssl_sign($message, $signature, $key->to_pem(), $hash);
                 if ($result !== true) {
                     throw new RuntimeException('Unable to sign the data');
                 }
-
                 return $signature;
-
             default:
                 throw new InvalidArgumentException('Unsupported mode.');
         }
     }
-
     /**
      * Create a signature.
      *
      * @return non-empty-string
      */
-    public static function signWithPSS(RSAKey $key, string $message, string $hash): string
+    public static function sign_with_pss(Rsa_Key $key, string $message, string $hash): string
     {
-        $em = self::encodeEMSAPSS($message, 8 * $key->getModulusLength() - 1, Hash::get($hash));
-        $message = BigInteger::createFromBinaryString($em);
-        $signature = RSAKey::exponentiate($key, $message);
-        $result = self::convertIntegerToOctetString($signature, $key->getModulusLength());
+        $em = self::encode_emsapss($message, 8 * $key->get_modulus_length() - 1, Hash::get($hash));
+        $message = Big_Integer::create_from_binary_string($em);
+        $signature = Rsa_Key::exponentiate($key, $message);
+        $result = self::convert_integer_to_octet_string($signature, $key->get_modulus_length());
         if ($result === '') {
             throw new InvalidArgumentException('Invalid signature.');
         }
-
         return $result;
     }
-
-    public static function verify(RSAKey $key, string $message, string $signature, string $hash, int $mode): bool
+    public static function verify(Rsa_Key $key, string $message, string $signature, string $hash, int $mode): bool
     {
         switch ($mode) {
             case self::SIGNATURE_PSS:
-                return self::verifyWithPSS($key, $message, $signature, $hash);
+                return self::verify_with_pss($key, $message, $signature, $hash);
             case self::SIGNATURE_PKCS1:
-                if (! extension_loaded('openssl')) {
+                if (!extension_loaded('openssl')) {
                     throw new RuntimeException('Please install the OpenSSL extension');
                 }
-                return openssl_verify($message, $signature, $key->toPEM(), $hash) === 1;
+                return openssl_verify($message, $signature, $key->to_pem(), $hash) === 1;
             default:
                 throw new InvalidArgumentException('Unsupported mode.');
         }
     }
-
     /**
      * Verifies a signature.
      */
-    public static function verifyWithPSS(RSAKey $key, string $message, string $signature, string $hash): bool
+    public static function verify_with_pss(Rsa_Key $key, string $message, string $signature, string $hash): bool
     {
-        if (strlen($signature) !== $key->getModulusLength()) {
+        if (strlen($signature) !== $key->get_modulus_length()) {
             throw new RuntimeException();
         }
-        $s2 = BigInteger::createFromBinaryString($signature);
-        $m2 = RSAKey::exponentiate($key, $s2);
-        $em = self::convertIntegerToOctetString($m2, $key->getModulusLength());
-        $modBits = 8 * $key->getModulusLength();
-
-        return self::verifyEMSAPSS($message, $em, $modBits - 1, Hash::get($hash));
+        $s2 = Big_Integer::create_from_binary_string($signature);
+        $m2 = Rsa_Key::exponentiate($key, $s2);
+        $em = self::convert_integer_to_octet_string($m2, $key->get_modulus_length());
+        $mod_bits = 8 * $key->get_modulus_length();
+        return self::verify_emsapss($message, $em, $mod_bits - 1, Hash::get($hash));
     }
-
-    private static function convertIntegerToOctetString(BigInteger $x, int $xLen): string
+    private static function convert_integer_to_octet_string(Big_Integer $x, int $x_len): string
     {
-        $x = $x->toBytes();
-        if (strlen($x) > $xLen) {
+        $x = $x->to_bytes();
+        if (strlen($x) > $x_len) {
             throw new RuntimeException();
         }
-
-        return str_pad($x, $xLen, chr(0), STR_PAD_LEFT);
+        return str_pad($x, $x_len, chr(0), STR_PAD_LEFT);
     }
-
     /**
      * MGF1.
      */
-    private static function getMGF1(string $mgfSeed, int $maskLen, Hash $mgfHash): string
+    private static function get_mgf1(string $mgf_seed, int $mask_len, Hash $mgf_hash): string
     {
         $t = '';
-        $count = ceil($maskLen / $mgfHash->getLength());
+        $count = ceil($mask_len / $mgf_hash->get_length());
         for ($i = 0; $i < $count; ++$i) {
             $c = pack('N', $i);
-            $t .= $mgfHash->hash($mgfSeed . $c);
+            $t .= $mgf_hash->hash($mgf_seed . $c);
         }
-
-        return substr($t, 0, $maskLen);
+        return substr($t, 0, $mask_len);
     }
-
     /**
      * EMSA-PSS-ENCODE.
      */
-    private static function encodeEMSAPSS(string $message, int $modulusLength, Hash $hash): string
+    private static function encode_emsapss(string $message, int $modulus_length, Hash $hash): string
     {
-        $emLen = ($modulusLength + 1) >> 3;
-        $sLen = $hash->getLength();
-        $mHash = $hash->hash($message);
-        if ($emLen <= $hash->getLength() + $sLen + 2) {
+        $em_len = $modulus_length + 1 >> 3;
+        $s_len = $hash->get_length();
+        $m_hash = $hash->hash($message);
+        if ($em_len <= $hash->get_length() + $s_len + 2) {
             throw new RuntimeException();
         }
-        $salt = random_bytes($sLen);
-        $m2 = "\0\0\0\0\0\0\0\0" . $mHash . $salt;
+        $salt = random_bytes($s_len);
+        $m2 = "\x00\x00\x00\x00\x00\x00\x00\x00" . $m_hash . $salt;
         $h = $hash->hash($m2);
-        $ps = str_repeat(chr(0), $emLen - $sLen - $hash->getLength() - 2);
+        $ps = str_repeat(chr(0), $em_len - $s_len - $hash->get_length() - 2);
         $db = $ps . chr(1) . $salt;
-        $dbMask = self::getMGF1($h, $emLen - $hash->getLength() - 1, $hash);
-        $maskedDB = $db ^ $dbMask;
-        $maskedDB[0] = ~chr(0xFF << ($modulusLength & 7)) & $maskedDB[0];
-
-        return $maskedDB . $h . chr(0xBC);
+        $db_mask = self::get_mgf1($h, $em_len - $hash->get_length() - 1, $hash);
+        $masked_db = $db ^ $db_mask;
+        $masked_db[0] = ~chr(0xff << ($modulus_length & 7)) & $masked_db[0];
+        return $masked_db . $h . chr(0xbc);
     }
-
     /**
      * EMSA-PSS-VERIFY.
      */
-    private static function verifyEMSAPSS(string $m, string $em, int $emBits, Hash $hash): bool
+    private static function verify_emsapss(string $m, string $em, int $em_bits, Hash $hash): bool
     {
-        $emLen = ($emBits + 1) >> 3;
-        $sLen = $hash->getLength();
-        $mHash = $hash->hash($m);
-        if ($emLen < $hash->getLength() + $sLen + 2) {
+        $em_len = $em_bits + 1 >> 3;
+        $s_len = $hash->get_length();
+        $m_hash = $hash->hash($m);
+        if ($em_len < $hash->get_length() + $s_len + 2) {
             throw new InvalidArgumentException();
         }
-        if ($em[strlen($em) - 1] !== chr(0xBC)) {
+        if ($em[strlen($em) - 1] !== chr(0xbc)) {
             throw new InvalidArgumentException();
         }
-        $maskedDB = substr($em, 0, -$hash->getLength() - 1);
-        $h = substr($em, -$hash->getLength() - 1, $hash->getLength());
-        $temp = chr(0xFF << ($emBits & 7));
-        if ((~$maskedDB[0] & $temp) !== $temp) {
+        $masked_db = substr($em, 0, -$hash->get_length() - 1);
+        $h = substr($em, -$hash->get_length() - 1, $hash->get_length());
+        $temp = chr(0xff << ($em_bits & 7));
+        if ((~$masked_db[0] & $temp) !== $temp) {
             throw new InvalidArgumentException();
         }
-        $dbMask = self::getMGF1($h, $emLen - $hash->getLength() - 1, $hash/*MGF*/);
-        $db = $maskedDB ^ $dbMask;
-        $db[0] = ~chr(0xFF << ($emBits & 7)) & $db[0];
-        $temp = $emLen - $hash->getLength() - $sLen - 2;
+        $db_mask = self::get_mgf1($h, $em_len - $hash->get_length() - 1, $hash);
+        $db = $masked_db ^ $db_mask;
+        $db[0] = ~chr(0xff << ($em_bits & 7)) & $db[0];
+        $temp = $em_len - $hash->get_length() - $s_len - 2;
         if (substr($db, 0, $temp) !== str_repeat(chr(0), $temp)) {
             throw new InvalidArgumentException();
         }
         if (ord($db[$temp]) !== 1) {
             throw new InvalidArgumentException();
         }
-        $salt = substr($db, $temp + 1); // should be $sLen long
-        $m2 = "\0\0\0\0\0\0\0\0" . $mHash . $salt;
+        $salt = substr($db, $temp + 1);
+        // should be $sLen long
+        $m2 = "\x00\x00\x00\x00\x00\x00\x00\x00" . $m_hash . $salt;
         $h2 = $hash->hash($m2);
-
         return hash_equals($h, $h2);
     }
 }

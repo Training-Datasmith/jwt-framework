@@ -1,15 +1,13 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection\Source;
 
-namespace Jose\Bundle\JoseFramework\DependencyInjection\Source;
-
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-
-interface SourceWithCompilerPasses extends Source
+use Symfony\Component\Dependency_Injection\Compiler\Compiler_Pass_Interface;
+interface Source_With_Compiler_Passes extends Source
 {
     /**
      * @return CompilerPassInterface[]
      */
-    public function getCompilerPasses(): array;
+    public function get_compiler_passes(): array;
 }

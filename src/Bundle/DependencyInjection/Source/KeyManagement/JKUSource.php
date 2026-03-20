@@ -1,53 +1,38 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Key_Management;
 
-namespace Jose\Bundle\JoseFramework\DependencyInjection\Source\KeyManagement;
-
-use Jose\Bundle\JoseFramework\DependencyInjection\Source\Source;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Source;
 use Override;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-
-final readonly class JKUSource implements Source
+use Symfony\Component\Config\Definition\Builder\Node_Definition;
+use Symfony\Component\Config\File_Locator;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+use Symfony\Component\Dependency_Injection\Loader\Php_File_Loader;
+final readonly class Jku_Source implements Source
 {
     #[Override]
     public function name(): string
     {
         return 'jku_factory';
     }
-
     #[Override]
-    public function load(array $configs, ContainerBuilder $container): void
+    public function load(array $configs, Container_Builder $container): void
     {
         if ($configs[$this->name()]['enabled'] === true) {
-            $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../../Resources/config'));
+            $loader = new Php_File_Loader($container, new File_Locator(__DIR__ . '/../../../Resources/config'));
             $loader->load('jku_source.php');
             $loader->load('jku_commands.php');
-            $container->setAlias('jose.http_client', $configs[$this->name()]['client']);
+            $container->set_alias('jose.http_client', $configs[$this->name()]['client']);
         }
     }
-
     #[Override]
-    public function getNodeDefinition(NodeDefinition $node): void
+    public function get_node_definition(Node_Definition $node): void
     {
-        $node->children()
-            ->arrayNode('jku_factory')
-            ->canBeEnabled()
-            ->children()
-            ->scalarNode('client')
-            ->info('HTTP Client used to retrieve key sets.')
-            ->isRequired()
-            ->end()
-            ->end()
-            ->end()
-            ->end();
+        $node->children()->array_node('jku_factory')->can_be_enabled()->children()->scalar_node('client')->info('HTTP Client used to retrieve key sets.')->is_required()->end()->end()->end()->end();
     }
-
     #[Override]
-    public function prepend(ContainerBuilder $container, array $config): array
+    public function prepend(Container_Builder $container, array $config): array
     {
         return [];
     }

@@ -1,74 +1,58 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Checker;
 
 use function is_float;
 use function is_int;
-
 use Override;
-use Psr\Clock\ClockInterface;
-
+use Psr\Clock\Clock_Interface;
 /**
  * This class is a claim checker.
  *
  * When the "exp" is present, it will compare the value with the current timestamp.
  */
-final readonly class ExpirationTimeChecker implements ClaimChecker, HeaderChecker
+final readonly class Expiration_Time_Checker implements Claim_Checker, Header_Checker
 {
     private const NAME = 'exp';
-
-    public function __construct(
-        private ClockInterface $clock,
-        private int $allowedTimeDrift = 0,
-        private bool $protectedHeaderOnly = false,
-    ) {
-    }
-
-    #[Override]
-    public function checkClaim(mixed $value): void
+    public function __construct(private Clock_Interface $clock, private int $allowed_time_drift = 0, private bool $protected_header_only = false)
     {
-        if (! is_float($value) && ! is_int($value)) {
-            throw new InvalidClaimException('"exp" must be an integer.', self::NAME, $value);
+    }
+    #[Override]
+    public function check_claim(mixed $value): void
+    {
+        if (!is_float($value) && !is_int($value)) {
+            throw new Invalid_Claim_Exception('"exp" must be an integer.', self::NAME, $value);
         }
-
-        $now = $this->clock->now()
-            ->getTimestamp();
-        if ($now > $value + $this->allowedTimeDrift) {
-            throw new InvalidClaimException('The token expired.', self::NAME, $value);
+        $now = $this->clock->now()->get_timestamp();
+        if ($now > $value + $this->allowed_time_drift) {
+            throw new Invalid_Claim_Exception('The token expired.', self::NAME, $value);
         }
     }
-
     #[Override]
-    public function supportedClaim(): string
+    public function supported_claim(): string
     {
         return self::NAME;
     }
-
     #[Override]
-    public function checkHeader(mixed $value): void
+    public function check_header(mixed $value): void
     {
-        if (! is_float($value) && ! is_int($value)) {
-            throw new InvalidHeaderException('"exp" must be an integer.', self::NAME, $value);
+        if (!is_float($value) && !is_int($value)) {
+            throw new Invalid_Header_Exception('"exp" must be an integer.', self::NAME, $value);
         }
-
-        $now = $this->clock->now()
-            ->getTimestamp();
-        if ($now > $value + $this->allowedTimeDrift) {
-            throw new InvalidHeaderException('The token expired.', self::NAME, $value);
+        $now = $this->clock->now()->get_timestamp();
+        if ($now > $value + $this->allowed_time_drift) {
+            throw new Invalid_Header_Exception('The token expired.', self::NAME, $value);
         }
     }
-
     #[Override]
-    public function supportedHeader(): string
+    public function supported_header(): string
     {
         return self::NAME;
     }
-
     #[Override]
-    public function protectedHeaderOnly(): bool
+    public function protected_header_only(): bool
     {
-        return $this->protectedHeaderOnly;
+        return $this->protected_header_only;
     }
 }

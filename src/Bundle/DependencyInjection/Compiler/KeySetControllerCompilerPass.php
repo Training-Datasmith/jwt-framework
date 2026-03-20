@@ -1,39 +1,30 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Jose\Bundle\JoseFramework\DependencyInjection\Compiler;
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection\Compiler;
 
 use InvalidArgumentException;
-use Jose\Bundle\JoseFramework\Routing\JWKSetLoader;
+use Jose\Bundle\Jose_Framework\Routing\Jwk_Set_Loader;
 use Override;
-
 use function sprintf;
-
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-final readonly class KeySetControllerCompilerPass implements CompilerPassInterface
+use Symfony\Component\Dependency_Injection\Compiler\Compiler_Pass_Interface;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+final readonly class Key_Set_Controller_Compiler_Pass implements Compiler_Pass_Interface
 {
     #[Override]
-    public function process(ContainerBuilder $container): void
+    public function process(Container_Builder $container): void
     {
-        if (! $container->hasDefinition(JWKSetLoader::class)) {
+        if (!$container->has_definition(Jwk_Set_Loader::class)) {
             return;
         }
-
-        $definition = $container->getDefinition(JWKSetLoader::class);
-
-        $taggedAlgorithmServices = $container->findTaggedServiceIds('jose.jwk_uri.controller');
-        foreach ($taggedAlgorithmServices as $id => $tags) {
+        $definition = $container->get_definition(Jwk_Set_Loader::class);
+        $tagged_algorithm_services = $container->find_tagged_service_ids('jose.jwk_uri.controller');
+        foreach ($tagged_algorithm_services as $id => $tags) {
             foreach ($tags as $attributes) {
-                if (! isset($attributes['path'])) {
-                    throw new InvalidArgumentException(sprintf(
-                        'The controller "%s" does not have any "path" attribute.',
-                        $id
-                    ));
+                if (!isset($attributes['path'])) {
+                    throw new InvalidArgumentException(sprintf('The controller "%s" does not have any "path" attribute.', $id));
                 }
-                $definition->addMethodCall('add', [$attributes['path'], $id]);
+                $definition->add_method_call('add', [$attributes['path'], $id]);
             }
         }
     }

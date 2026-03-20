@@ -1,20 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Jose\Bundle\JoseFramework\Event;
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Event;
 
 use Jose\Component\Encryption\JWE;
-use Symfony\Contracts\EventDispatcher\Event;
-
-final class JWEBuiltSuccessEvent extends Event
+use Symfony\Contracts\Event_Dispatcher\Event;
+final class Jwe_Built_Success_Event extends Event
 {
-    public function __construct(
-        private readonly JWE $jwe
-    ) {
+    public function __construct(private readonly JWE $jwe)
+    {
     }
-
-    public function getJwe(): JWE
+    public function get_jwe(): JWE
     {
         return $this->jwe;
     }

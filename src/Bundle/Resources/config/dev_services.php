@@ -1,31 +1,19 @@
 <?php
 
-declare(strict_types=1);
-
-use Jose\Bundle\JoseFramework\DataCollector\AlgorithmCollector;
-use Jose\Bundle\JoseFramework\DataCollector\CheckerCollector;
-use Jose\Bundle\JoseFramework\DataCollector\JoseCollector;
-use Jose\Bundle\JoseFramework\DataCollector\JWECollector;
-use Jose\Bundle\JoseFramework\DataCollector\JWSCollector;
-use Jose\Bundle\JoseFramework\DataCollector\KeyCollector;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-
-return function (ContainerConfigurator $container): void {
-    $container = $container->services()
-        ->defaults()
-        ->private()
-        ->autoconfigure()
-        ->autowire();
-
-    $container->set(JoseCollector::class)
-        ->tag('data_collector', [
-            'id' => 'jose_collector',
-            'template' => '@JoseFramework/data_collector/template.html.twig',
-        ]);
-
-    $container->set(AlgorithmCollector::class);
-    $container->set(CheckerCollector::class);
-    $container->set(JWECollector::class);
-    $container->set(JWSCollector::class);
-    $container->set(KeyCollector::class);
+declare (strict_types=1);
+use Jose\Bundle\Jose_Framework\Data_Collector\Algorithm_Collector;
+use Jose\Bundle\Jose_Framework\Data_Collector\Checker_Collector;
+use Jose\Bundle\Jose_Framework\Data_Collector\Jose_Collector;
+use Jose\Bundle\Jose_Framework\Data_Collector\Jwe_Collector;
+use Jose\Bundle\Jose_Framework\Data_Collector\Jws_Collector;
+use Jose\Bundle\Jose_Framework\Data_Collector\Key_Collector;
+use Symfony\Component\Dependency_Injection\Loader\Configurator\Container_Configurator;
+return function (Container_Configurator $container): void {
+    $container = $container->services()->defaults()->private()->autoconfigure()->autowire();
+    $container->set(Jose_Collector::class)->tag('data_collector', ['id' => 'jose_collector', 'template' => '@JoseFramework/data_collector/template.html.twig']);
+    $container->set(Algorithm_Collector::class);
+    $container->set(Checker_Collector::class);
+    $container->set(Jwe_Collector::class);
+    $container->set(Jws_Collector::class);
+    $container->set(Key_Collector::class);
 };

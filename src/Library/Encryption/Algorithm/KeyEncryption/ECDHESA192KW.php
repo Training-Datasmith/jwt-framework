@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Jose\Component\Encryption\Algorithm\KeyEncryption;
+declare (strict_types=1);
+namespace Jose\Component\Encryption\Algorithm\Key_Encryption;
 
 use AESKW\A192KW as Wrapper;
 use Override;
-
 final readonly class ECDHESA192KW extends ECDHESAESKW
 {
     #[Override]
@@ -14,15 +12,13 @@ final readonly class ECDHESA192KW extends ECDHESAESKW
     {
         return 'ECDH-ES+A192KW';
     }
-
     #[Override]
-    protected function getWrapper(): Wrapper
+    protected function get_wrapper(): Wrapper
     {
         return new Wrapper();
     }
-
     #[Override]
-    protected function getKeyLength(): int
+    protected function get_key_length(): int
     {
         return 192;
     }

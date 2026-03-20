@@ -1,64 +1,48 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Console;
 
 use InvalidArgumentException;
-
 use function is_bool;
-
-use Jose\Component\Core\Util\Base64UrlSafe;
-use Jose\Component\KeyManagement\JWKFactory;
+use Jose\Component\Core\Util\Base64url_Safe;
+use Jose\Component\Key_Management\Jwk_Factory;
 use Override;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-
-abstract class GeneratorCommand extends ObjectOutputCommand
+use Symfony\Component\Console\Input\Input_Interface;
+use Symfony\Component\Console\Input\Input_Option;
+abstract class Generator_Command extends Object_Output_Command
 {
     #[Override]
-    public function isEnabled(): bool
+    public function is_enabled(): bool
     {
-        return class_exists(JWKFactory::class);
+        return class_exists(Jwk_Factory::class);
     }
-
     #[Override]
     protected function configure(): void
     {
         parent::configure();
-        $this
-            ->addOption('use', 'u', InputOption::VALUE_OPTIONAL, 'Usage of the key. Must be either "sig" or "enc".')
-            ->addOption('alg', 'a', InputOption::VALUE_OPTIONAL, 'Algorithm for the key.')
-            ->addOption(
-                'random_id',
-                null,
-                InputOption::VALUE_NONE,
-                'If this option is set, a random key ID (kid) will be generated.'
-            );
+        $this->add_option('use', 'u', Input_Option::VALUE_OPTIONAL, 'Usage of the key. Must be either "sig" or "enc".')->add_option('alg', 'a', Input_Option::VALUE_OPTIONAL, 'Algorithm for the key.')->add_option('random_id', null, Input_Option::VALUE_NONE, 'If this option is set, a random key ID (kid) will be generated.');
     }
-
-    protected function getOptions(InputInterface $input): array
+    protected function get_options(Input_Interface $input): array
     {
         $args = [];
-        $useRandomId = $input->getOption('random_id');
-        if (! is_bool($useRandomId)) {
+        $use_random_id = $input->get_option('random_id');
+        if (!is_bool($use_random_id)) {
             throw new InvalidArgumentException('Invalid value for option "random_id"');
         }
-        if ($useRandomId) {
-            $args['kid'] = $this->generateKeyID();
+        if ($use_random_id) {
+            $args['kid'] = $this->generate_key_id();
         }
         foreach (['use', 'alg'] as $key) {
-            $value = $input->getOption($key);
+            $value = $input->get_option($key);
             if ($value !== null) {
                 $args[$key] = $value;
             }
         }
-
         return $args;
     }
-
-    private function generateKeyID(): string
+    private function generate_key_id(): string
     {
-        return Base64UrlSafe::encode(random_bytes(32));
+        return Base64url_Safe::encode(random_bytes(32));
     }
 }

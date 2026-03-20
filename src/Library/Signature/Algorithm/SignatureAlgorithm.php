@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Signature\Algorithm;
 
 use Jose\Component\Core\Algorithm;
 use Jose\Component\Core\JWK;
-
-interface SignatureAlgorithm extends Algorithm
+interface Signature_Algorithm extends Algorithm
 {
     /**
      * Sign the input.
@@ -16,7 +14,6 @@ interface SignatureAlgorithm extends Algorithm
      * @param string $input The input
      */
     public function sign(JWK $key, string $input): string;
-
     /**
      * Verify the signature of data.
      *

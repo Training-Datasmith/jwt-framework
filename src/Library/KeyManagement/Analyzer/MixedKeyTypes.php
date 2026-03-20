@@ -1,41 +1,33 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Component\Key_Management\Analyzer;
 
-namespace Jose\Component\KeyManagement\Analyzer;
-
-use Jose\Component\Core\JWKSet;
+use Jose\Component\Core\Jwk_Set;
 use Override;
-
-final class MixedKeyTypes implements KeysetAnalyzer
+final class Mixed_Key_Types implements Keyset_Analyzer
 {
     #[Override]
-    public function analyze(JWKSet $jwkset, MessageBag $bag): void
+    public function analyze(Jwk_Set $jwkset, Message_Bag $bag): void
     {
         if ($jwkset->count() === 0) {
             return;
         }
-
-        $hasSymmetricKeys = false;
-        $hasAsymmetricKeys = false;
-
+        $has_symmetric_keys = false;
+        $has_asymmetric_keys = false;
         foreach ($jwkset as $jwk) {
             switch ($jwk->get('kty')) {
                 case 'oct':
-                    $hasSymmetricKeys = true;
-
+                    $has_symmetric_keys = true;
                     break;
-
                 case 'OKP':
                 case 'RSA':
                 case 'EC':
-                    $hasAsymmetricKeys = true;
-
+                    $has_asymmetric_keys = true;
                     break;
             }
         }
-
-        if ($hasAsymmetricKeys && $hasSymmetricKeys) {
+        if ($has_asymmetric_keys && $has_symmetric_keys) {
             $bag->add(Message::medium('This key set mixes symmetric and asymmetric keys.'));
         }
     }

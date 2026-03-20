@@ -1,55 +1,45 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Jose\Bundle\JoseFramework\DependencyInjection\Compiler;
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection\Compiler;
 
 use InvalidArgumentException;
-use Jose\Bundle\JoseFramework\Services\HeaderCheckerManagerFactory;
+use Jose\Bundle\Jose_Framework\Services\Header_Checker_Manager_Factory;
 use Override;
-
 use function sprintf;
-
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
-final readonly class HeaderCheckerCompilerPass implements CompilerPassInterface
+use Symfony\Component\Dependency_Injection\Compiler\Compiler_Pass_Interface;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+use Symfony\Component\Dependency_Injection\Definition;
+use Symfony\Component\Dependency_Injection\Reference;
+final readonly class Header_Checker_Compiler_Pass implements Compiler_Pass_Interface
 {
     #[Override]
-    public function process(ContainerBuilder $container): void
+    public function process(Container_Builder $container): void
     {
-        if (! $container->hasDefinition(HeaderCheckerManagerFactory::class)) {
+        if (!$container->has_definition(Header_Checker_Manager_Factory::class)) {
             return;
         }
-
-        $definition = $container->getDefinition(HeaderCheckerManagerFactory::class);
-        $this->addHeaderCheckers($definition, $container);
-        $this->addTokenType($definition, $container);
+        $definition = $container->get_definition(Header_Checker_Manager_Factory::class);
+        $this->add_header_checkers($definition, $container);
+        $this->add_token_type($definition, $container);
     }
-
-    private function addHeaderCheckers(Definition $definition, ContainerBuilder $container): void
+    private function add_header_checkers(Definition $definition, Container_Builder $container): void
     {
-        $taggedHeaderCheckerServices = $container->findTaggedServiceIds('jose.checker.header');
-        foreach ($taggedHeaderCheckerServices as $id => $tags) {
+        $tagged_header_checker_services = $container->find_tagged_service_ids('jose.checker.header');
+        foreach ($tagged_header_checker_services as $id => $tags) {
             foreach ($tags as $attributes) {
-                if (! isset($attributes['alias'])) {
-                    throw new InvalidArgumentException(sprintf(
-                        'The header checker "%s" does not have any "alias" attribute.',
-                        $id
-                    ));
+                if (!isset($attributes['alias'])) {
+                    throw new InvalidArgumentException(sprintf('The header checker "%s" does not have any "alias" attribute.', $id));
                 }
-                $definition->addMethodCall('add', [$attributes['alias'], new Reference($id)]);
+                $definition->add_method_call('add', [$attributes['alias'], new Reference($id)]);
             }
         }
     }
-
-    private function addTokenType(Definition $definition, ContainerBuilder $container): void
+    private function add_token_type(Definition $definition, Container_Builder $container): void
     {
-        $taggedHeaderCheckerServices = $container->findTaggedServiceIds('jose.checker.token_type');
-        foreach ($taggedHeaderCheckerServices as $id => $tags) {
-            $definition->addMethodCall('addTokenTypeSupport', [new Reference($id)]);
+        $tagged_header_checker_services = $container->find_tagged_service_ids('jose.checker.token_type');
+        foreach ($tagged_header_checker_services as $id => $tags) {
+            $definition->add_method_call('addTokenTypeSupport', [new Reference($id)]);
         }
     }
 }

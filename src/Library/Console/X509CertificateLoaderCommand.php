@@ -1,48 +1,41 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Console;
 
 use InvalidArgumentException;
-
 use function is_string;
-
-use Jose\Component\KeyManagement\JWKFactory;
+use Jose\Component\Key_Management\Jwk_Factory;
 use Override;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
-#[AsCommand(name: 'key:load:x509', description: 'Load a key from a X.509 certificate file.', )]
-final class X509CertificateLoaderCommand extends GeneratorCommand
+use Symfony\Component\Console\Attribute\As_Command;
+use Symfony\Component\Console\Input\Input_Argument;
+use Symfony\Component\Console\Input\Input_Interface;
+use Symfony\Component\Console\Output\Output_Interface;
+#[As_Command(name: 'key:load:x509', description: 'Load a key from a X.509 certificate file.')]
+final class X509certificate_Loader_Command extends Generator_Command
 {
     #[Override]
     protected function configure(): void
     {
         parent::configure();
-        $this->addArgument('file', InputArgument::REQUIRED, 'Filename of the X.509 certificate.');
+        $this->add_argument('file', Input_Argument::REQUIRED, 'Filename of the X.509 certificate.');
     }
-
     #[Override]
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(Input_Interface $input, Output_Interface $output): int
     {
-        $file = $input->getArgument('file');
-        if (! is_string($file)) {
+        $file = $input->get_argument('file');
+        if (!is_string($file)) {
             throw new InvalidArgumentException('Invalid file');
         }
         $args = [];
         foreach (['use', 'alg'] as $key) {
-            $value = $input->getOption($key);
+            $value = $input->get_option($key);
             if ($value !== null) {
                 $args[$key] = $value;
             }
         }
-
-        $jwk = JWKFactory::createFromCertificateFile($file, $args);
-        $this->prepareJsonOutput($input, $output, $jwk);
-
+        $jwk = Jwk_Factory::create_from_certificate_file($file, $args);
+        $this->prepare_json_output($input, $output, $jwk);
         return self::SUCCESS;
     }
 }

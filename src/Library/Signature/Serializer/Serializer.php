@@ -1,18 +1,16 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Signature\Serializer;
 
 use function array_key_exists;
-
-abstract readonly class Serializer implements JWSSerializer
+abstract readonly class Serializer implements Jws_Serializer
 {
     /**
      * @param array<string, mixed> $protectedHeader
      */
-    protected function isPayloadEncoded(array $protectedHeader): bool
+    protected function is_payload_encoded(array $protected_header): bool
     {
-        return ! array_key_exists('b64', $protectedHeader) || $protectedHeader['b64'] === true;
+        return !array_key_exists('b64', $protected_header) || $protected_header['b64'] === true;
     }
 }

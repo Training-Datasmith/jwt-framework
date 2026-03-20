@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Jose\Experimental\KeyEncryption;
+declare (strict_types=1);
+namespace Jose\Experimental\Key_Encryption;
 
 use Override;
-
 final readonly class A192CTR extends AESCTR
 {
     #[Override]
@@ -13,9 +11,8 @@ final readonly class A192CTR extends AESCTR
     {
         return 'A192CTR';
     }
-
     #[Override]
-    protected function getMode(): string
+    protected function get_mode(): string
     {
         return 'aes-192-ctr';
     }

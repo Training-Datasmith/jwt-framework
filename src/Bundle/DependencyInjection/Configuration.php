@@ -1,35 +1,28 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection;
 
-namespace Jose\Bundle\JoseFramework\DependencyInjection;
-
-use Jose\Bundle\JoseFramework\DependencyInjection\Source\Source;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Source;
 use Override;
-use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
-
-final readonly class Configuration implements ConfigurationInterface
+use Symfony\Component\Config\Definition\Builder\Tree_Builder;
+use Symfony\Component\Config\Definition\Configuration_Interface;
+final readonly class Configuration implements Configuration_Interface
 {
     /**
      * @param Source[] $sources
      */
-    public function __construct(
-        private readonly string $alias,
-        private readonly array $sources
-    ) {
-    }
-
-    #[Override]
-    public function getConfigTreeBuilder(): TreeBuilder
+    public function __construct(private readonly string $alias, private readonly array $sources)
     {
-        $treeBuilder = new TreeBuilder($this->alias);
-        $rootNode = $treeBuilder->getRootNode();
-
+    }
+    #[Override]
+    public function get_config_tree_builder(): Tree_Builder
+    {
+        $tree_builder = new Tree_Builder($this->alias);
+        $root_node = $tree_builder->get_root_node();
         foreach ($this->sources as $source) {
-            $source->getNodeDefinition($rootNode);
+            $source->get_node_definition($root_node);
         }
-
-        return $treeBuilder;
+        return $tree_builder;
     }
 }

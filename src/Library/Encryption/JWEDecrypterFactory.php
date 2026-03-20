@@ -1,25 +1,20 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Encryption;
 
-use Jose\Component\Core\AlgorithmManagerFactory;
-
-class JWEDecrypterFactory
+use Jose\Component\Core\Algorithm_Manager_Factory;
+class Jwe_Decrypter_Factory
 {
-    public function __construct(
-        private readonly AlgorithmManagerFactory $algorithmManagerFactory,
-    ) {
+    public function __construct(private readonly Algorithm_Manager_Factory $algorithm_manager_factory)
+    {
     }
-
     /**
      * @param string[] $encryptionAlgorithms
      */
-    public function create(array $encryptionAlgorithms): JWEDecrypter
+    public function create(array $encryption_algorithms): Jwe_Decrypter
     {
-        $algorithmManager = $this->algorithmManagerFactory->create($encryptionAlgorithms);
-
-        return new JWEDecrypter($algorithmManager);
+        $algorithm_manager = $this->algorithm_manager_factory->create($encryption_algorithms);
+        return new Jwe_Decrypter($algorithm_manager);
     }
 }

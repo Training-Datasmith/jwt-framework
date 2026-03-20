@@ -1,130 +1,47 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Jose\Bundle\JoseFramework\Helper;
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Helper;
 
 use function is_array;
-
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-final readonly class ConfigurationHelper
+use Symfony\Component\Dependency_Injection\Container_Builder;
+final readonly class Configuration_Helper
 {
     final public const BUNDLE_ALIAS = 'jose';
-
     /**
      * @param string[] $signatureAlgorithms
      */
-    public static function addJWSBuilder(
-        ContainerBuilder $container,
-        string $name,
-        array $signatureAlgorithms,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'jws' => [
-                    'builders' => [
-                        $name => [
-                            'is_public' => $isPublic,
-                            'signature_algorithms' => $signatureAlgorithms,
-                            'tags' => $tags,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-        self::updateJoseConfiguration($container, $config, 'jws');
+    public static function add_jws_builder(Container_Builder $container, string $name, array $signature_algorithms, bool $is_public = true, array $tags = []): void
+    {
+        $config = [self::BUNDLE_ALIAS => ['jws' => ['builders' => [$name => ['is_public' => $is_public, 'signature_algorithms' => $signature_algorithms, 'tags' => $tags]]]]];
+        self::update_jose_configuration($container, $config, 'jws');
     }
-
     /**
      * @param string[] $signatureAlgorithms
      */
-    public static function addJWSVerifier(
-        ContainerBuilder $container,
-        string $name,
-        array $signatureAlgorithms,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'jws' => [
-                    'verifiers' => [
-                        $name => [
-                            'is_public' => $isPublic,
-                            'signature_algorithms' => $signatureAlgorithms,
-                            'tags' => $tags,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        self::updateJoseConfiguration($container, $config, 'jws');
+    public static function add_jws_verifier(Container_Builder $container, string $name, array $signature_algorithms, bool $is_public = true, array $tags = []): void
+    {
+        $config = [self::BUNDLE_ALIAS => ['jws' => ['verifiers' => [$name => ['is_public' => $is_public, 'signature_algorithms' => $signature_algorithms, 'tags' => $tags]]]]];
+        self::update_jose_configuration($container, $config, 'jws');
     }
-
     /**
      * @param string[] $serializers
      */
-    public static function addJWSSerializer(
-        ContainerBuilder $container,
-        string $name,
-        array $serializers,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'jws' => [
-                    'serializers' => [
-                        $name => [
-                            'is_public' => $isPublic,
-                            'serializers' => $serializers,
-                            'tags' => $tags,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        self::updateJoseConfiguration($container, $config, 'jws');
+    public static function add_jws_serializer(Container_Builder $container, string $name, array $serializers, bool $is_public = true, array $tags = []): void
+    {
+        $config = [self::BUNDLE_ALIAS => ['jws' => ['serializers' => [$name => ['is_public' => $is_public, 'serializers' => $serializers, 'tags' => $tags]]]]];
+        self::update_jose_configuration($container, $config, 'jws');
     }
-
     /**
      * @param string[] $serializers
      * @param string[] $signatureAlgorithms
      * @param string[] $header_checkers
      */
-    public static function addJWSLoader(
-        ContainerBuilder $container,
-        string $name,
-        array $serializers,
-        array $signatureAlgorithms,
-        array $header_checkers,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'jws' => [
-                    'loaders' => [
-                        $name => [
-                            'is_public' => $isPublic,
-                            'serializers' => $serializers,
-                            'signature_algorithms' => $signatureAlgorithms,
-                            'header_checkers' => $header_checkers,
-                            'tags' => $tags,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        self::updateJoseConfiguration($container, $config, 'jws');
+    public static function add_jws_loader(Container_Builder $container, string $name, array $serializers, array $signature_algorithms, array $header_checkers, bool $is_public = true, array $tags = []): void
+    {
+        $config = [self::BUNDLE_ALIAS => ['jws' => ['loaders' => [$name => ['is_public' => $is_public, 'serializers' => $serializers, 'signature_algorithms' => $signature_algorithms, 'header_checkers' => $header_checkers, 'tags' => $tags]]]]];
+        self::update_jose_configuration($container, $config, 'jws');
     }
-
     /**
      * @param string[] $jweSerializers
      * @param string[] $encryptionAlgorithms
@@ -133,314 +50,97 @@ final readonly class ConfigurationHelper
      * @param string[] $signatureAlgorithms
      * @param string[] $jwsHeaderCheckers
      */
-    public static function addNestedTokenLoader(
-        ContainerBuilder $container,
-        string $name,
-        array $jweSerializers,
-        array $encryptionAlgorithms,
-        array $jweHeaderCheckers,
-        array $jwsSerializers,
-        array $signatureAlgorithms,
-        array $jwsHeaderCheckers,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'nested_token' => [
-                    'loaders' => [
-                        $name => [
-                            'is_public' => $isPublic,
-                            'jwe_serializers' => $jweSerializers,
-                            'encryption_algorithms' => $encryptionAlgorithms,
-                            'jwe_header_checkers' => $jweHeaderCheckers,
-                            'jws_serializers' => $jwsSerializers,
-                            'signature_algorithms' => $signatureAlgorithms,
-                            'jws_header_checkers' => $jwsHeaderCheckers,
-                            'tags' => $tags,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        self::updateJoseConfiguration($container, $config, 'nested_token');
+    public static function add_nested_token_loader(Container_Builder $container, string $name, array $jwe_serializers, array $encryption_algorithms, array $jwe_header_checkers, array $jws_serializers, array $signature_algorithms, array $jws_header_checkers, bool $is_public = true, array $tags = []): void
+    {
+        $config = [self::BUNDLE_ALIAS => ['nested_token' => ['loaders' => [$name => ['is_public' => $is_public, 'jwe_serializers' => $jwe_serializers, 'encryption_algorithms' => $encryption_algorithms, 'jwe_header_checkers' => $jwe_header_checkers, 'jws_serializers' => $jws_serializers, 'signature_algorithms' => $signature_algorithms, 'jws_header_checkers' => $jws_header_checkers, 'tags' => $tags]]]]];
+        self::update_jose_configuration($container, $config, 'nested_token');
     }
-
     /**
      * @param string[] $jweSerializers
      * @param string[] $encryptionAlgorithms
      * @param string[] $jwsSerializers
      * @param string[] $signatureAlgorithms
      */
-    public static function addNestedTokenBuilder(
-        ContainerBuilder $container,
-        string $name,
-        array $jweSerializers,
-        array $encryptionAlgorithms,
-        array $jwsSerializers,
-        array $signatureAlgorithms,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'nested_token' => [
-                    'builders' => [
-                        $name => [
-                            'is_public' => $isPublic,
-                            'jwe_serializers' => $jweSerializers,
-                            'encryption_algorithms' => $encryptionAlgorithms,
-                            'jws_serializers' => $jwsSerializers,
-                            'signature_algorithms' => $signatureAlgorithms,
-                            'tags' => $tags,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        self::updateJoseConfiguration($container, $config, 'nested_token');
+    public static function add_nested_token_builder(Container_Builder $container, string $name, array $jwe_serializers, array $encryption_algorithms, array $jws_serializers, array $signature_algorithms, bool $is_public = true, array $tags = []): void
+    {
+        $config = [self::BUNDLE_ALIAS => ['nested_token' => ['builders' => [$name => ['is_public' => $is_public, 'jwe_serializers' => $jwe_serializers, 'encryption_algorithms' => $encryption_algorithms, 'jws_serializers' => $jws_serializers, 'signature_algorithms' => $signature_algorithms, 'tags' => $tags]]]]];
+        self::update_jose_configuration($container, $config, 'nested_token');
     }
-
     /**
      * @param string[] $serializers
      */
-    public static function addJWESerializer(
-        ContainerBuilder $container,
-        string $name,
-        array $serializers,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'jwe' => [
-                    'serializers' => [
-                        $name => [
-                            'is_public' => $isPublic,
-                            'serializers' => $serializers,
-                            'tags' => $tags,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        self::updateJoseConfiguration($container, $config, 'jwe');
+    public static function add_jwe_serializer(Container_Builder $container, string $name, array $serializers, bool $is_public = true, array $tags = []): void
+    {
+        $config = [self::BUNDLE_ALIAS => ['jwe' => ['serializers' => [$name => ['is_public' => $is_public, 'serializers' => $serializers, 'tags' => $tags]]]]];
+        self::update_jose_configuration($container, $config, 'jwe');
     }
-
     /**
      * @param string[] $serializers
      * @param string[] $encryptionAlgorithms
      * @param string[] $header_checkers
      */
-    public static function addJWELoader(
-        ContainerBuilder $container,
-        string $name,
-        array $serializers,
-        array $encryptionAlgorithms,
-        array $header_checkers,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'jwe' => [
-                    'loaders' => [
-                        $name => [
-                            'is_public' => $isPublic,
-                            'serializers' => $serializers,
-                            'encryption_algorithms' => $encryptionAlgorithms,
-                            'header_checkers' => $header_checkers,
-                            'tags' => $tags,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        self::updateJoseConfiguration($container, $config, 'jwe');
+    public static function add_jwe_loader(Container_Builder $container, string $name, array $serializers, array $encryption_algorithms, array $header_checkers, bool $is_public = true, array $tags = []): void
+    {
+        $config = [self::BUNDLE_ALIAS => ['jwe' => ['loaders' => [$name => ['is_public' => $is_public, 'serializers' => $serializers, 'encryption_algorithms' => $encryption_algorithms, 'header_checkers' => $header_checkers, 'tags' => $tags]]]]];
+        self::update_jose_configuration($container, $config, 'jwe');
     }
-
     /**
      * @param string[] $claimCheckers
      */
-    public static function addClaimChecker(
-        ContainerBuilder $container,
-        string $name,
-        array $claimCheckers,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'checkers' => [
-                    'claims' => [
-                        $name => [
-                            'is_public' => $isPublic,
-                            'claims' => $claimCheckers,
-                            'tags' => $tags,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        self::updateJoseConfiguration($container, $config, 'checkers');
+    public static function add_claim_checker(Container_Builder $container, string $name, array $claim_checkers, bool $is_public = true, array $tags = []): void
+    {
+        $config = [self::BUNDLE_ALIAS => ['checkers' => ['claims' => [$name => ['is_public' => $is_public, 'claims' => $claim_checkers, 'tags' => $tags]]]]];
+        self::update_jose_configuration($container, $config, 'checkers');
     }
-
     /**
      * @param string[] $headerCheckers
      */
-    public static function addHeaderChecker(
-        ContainerBuilder $container,
-        string $name,
-        array $headerCheckers,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'checkers' => [
-                    'headers' => [
-                        $name => [
-                            'is_public' => $isPublic,
-                            'headers' => $headerCheckers,
-                            'tags' => $tags,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        self::updateJoseConfiguration($container, $config, 'checkers');
-    }
-
-    public static function addKey(
-        ContainerBuilder $container,
-        string $name,
-        string $type,
-        array $parameters,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $parameters['is_public'] = $isPublic;
-        $parameters['tags'] = $tags;
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'keys' => [
-                    $name => [
-                        $type => $parameters,
-                    ],
-                ],
-            ],
-        ];
-
-        self::updateJoseConfiguration($container, $config, 'keys');
-    }
-
-    public static function addKeyset(
-        ContainerBuilder $container,
-        string $name,
-        string $type,
-        array $parameters,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $parameters['is_public'] = $isPublic;
-        $parameters['tags'] = $tags;
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'key_sets' => [
-                    $name => [
-                        $type => $parameters,
-                    ],
-                ],
-            ],
-        ];
-
-        self::updateJoseConfiguration($container, $config, 'key_sets');
-    }
-
-    public static function addKeyUri(
-        ContainerBuilder $container,
-        string $name,
-        array $parameters,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $parameters['is_public'] = $isPublic;
-        $parameters['tags'] = $tags;
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'jwk_uris' => [
-                    $name => $parameters,
-                ],
-            ],
-        ];
-
-        self::updateJoseConfiguration($container, $config, 'jwk_uris');
-    }
-
-    public static function addJWEBuilder(
-        ContainerBuilder $container,
-        string $name,
-        array $encryptionAlgorithm,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'jwe' => [
-                    'builders' => [
-                        $name => [
-                            'is_public' => $isPublic,
-                            'encryption_algorithms' => $encryptionAlgorithm,
-                            'tags' => $tags,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        self::updateJoseConfiguration($container, $config, 'jwe');
-    }
-
-    public static function addJWEDecrypter(
-        ContainerBuilder $container,
-        string $name,
-        array $encryptionAlgorithm,
-        bool $isPublic = true,
-        array $tags = []
-    ): void {
-        $config = [
-            self::BUNDLE_ALIAS => [
-                'jwe' => [
-                    'decrypters' => [
-                        $name => [
-                            'is_public' => $isPublic,
-                            'encryption_algorithms' => $encryptionAlgorithm,
-                            'tags' => $tags,
-                        ],
-                    ],
-                ],
-            ],
-        ];
-
-        self::updateJoseConfiguration($container, $config, 'jwe');
-    }
-
-    private static function updateJoseConfiguration(ContainerBuilder $container, array $config, string $element): void
+    public static function add_header_checker(Container_Builder $container, string $name, array $header_checkers, bool $is_public = true, array $tags = []): void
     {
-        $jose_config = current($container->getExtensionConfig(self::BUNDLE_ALIAS));
-        if (! is_array($jose_config)) {
+        $config = [self::BUNDLE_ALIAS => ['checkers' => ['headers' => [$name => ['is_public' => $is_public, 'headers' => $header_checkers, 'tags' => $tags]]]]];
+        self::update_jose_configuration($container, $config, 'checkers');
+    }
+    public static function add_key(Container_Builder $container, string $name, string $type, array $parameters, bool $is_public = true, array $tags = []): void
+    {
+        $parameters['is_public'] = $is_public;
+        $parameters['tags'] = $tags;
+        $config = [self::BUNDLE_ALIAS => ['keys' => [$name => [$type => $parameters]]]];
+        self::update_jose_configuration($container, $config, 'keys');
+    }
+    public static function add_keyset(Container_Builder $container, string $name, string $type, array $parameters, bool $is_public = true, array $tags = []): void
+    {
+        $parameters['is_public'] = $is_public;
+        $parameters['tags'] = $tags;
+        $config = [self::BUNDLE_ALIAS => ['key_sets' => [$name => [$type => $parameters]]]];
+        self::update_jose_configuration($container, $config, 'key_sets');
+    }
+    public static function add_key_uri(Container_Builder $container, string $name, array $parameters, bool $is_public = true, array $tags = []): void
+    {
+        $parameters['is_public'] = $is_public;
+        $parameters['tags'] = $tags;
+        $config = [self::BUNDLE_ALIAS => ['jwk_uris' => [$name => $parameters]]];
+        self::update_jose_configuration($container, $config, 'jwk_uris');
+    }
+    public static function add_jwe_builder(Container_Builder $container, string $name, array $encryption_algorithm, bool $is_public = true, array $tags = []): void
+    {
+        $config = [self::BUNDLE_ALIAS => ['jwe' => ['builders' => [$name => ['is_public' => $is_public, 'encryption_algorithms' => $encryption_algorithm, 'tags' => $tags]]]]];
+        self::update_jose_configuration($container, $config, 'jwe');
+    }
+    public static function add_jwe_decrypter(Container_Builder $container, string $name, array $encryption_algorithm, bool $is_public = true, array $tags = []): void
+    {
+        $config = [self::BUNDLE_ALIAS => ['jwe' => ['decrypters' => [$name => ['is_public' => $is_public, 'encryption_algorithms' => $encryption_algorithm, 'tags' => $tags]]]]];
+        self::update_jose_configuration($container, $config, 'jwe');
+    }
+    private static function update_jose_configuration(Container_Builder $container, array $config, string $element): void
+    {
+        $jose_config = current($container->get_extension_config(self::BUNDLE_ALIAS));
+        if (!is_array($jose_config)) {
             $jose_config = [];
         }
-        if (! isset($jose_config[$element])) {
+        if (!isset($jose_config[$element])) {
             $jose_config[$element] = [];
         }
         $jose_config[$element] = array_merge($jose_config[$element], $config[self::BUNDLE_ALIAS][$element]);
-        $container->prependExtensionConfig(self::BUNDLE_ALIAS, $jose_config);
+        $container->prepend_extension_config(self::BUNDLE_ALIAS, $jose_config);
     }
 }

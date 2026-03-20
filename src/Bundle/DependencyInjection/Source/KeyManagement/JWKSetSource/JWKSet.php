@@ -1,50 +1,39 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Key_Management\Jwk_Set_Source;
 
-namespace Jose\Bundle\JoseFramework\DependencyInjection\Source\KeyManagement\JWKSetSource;
-
-use Jose\Bundle\JoseFramework\DependencyInjection\Source\AbstractSource;
-use Jose\Component\Core\JWKSet as JWKSetAlias;
-use Jose\Component\KeyManagement\JWKFactory;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Abstract_Source;
+use Jose\Component\Core\Jwk_Set as JWKSetAlias;
+use Jose\Component\Key_Management\Jwk_Factory;
 use Override;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
-final readonly class JWKSet extends AbstractSource implements JWKSetSource
+use Symfony\Component\Config\Definition\Builder\Node_Definition;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+use Symfony\Component\Dependency_Injection\Definition;
+use Symfony\Component\Dependency_Injection\Reference;
+final readonly class Jwk_Set extends Abstract_Source implements Jwk_Set_Source
 {
     /**
      * @param array<string, mixed> $config
      */
     #[Override]
-    public function createDefinition(ContainerBuilder $container, array $config): Definition
+    public function create_definition(Container_Builder $container, array $config): Definition
     {
-        $definition = new Definition(JWKSetAlias::class);
-        $definition->setFactory([new Reference(JWKFactory::class), 'createFromJsonObject']);
-        $definition->setArguments([$config['value']]);
-        $definition->addTag('jose.jwkset');
-
+        $definition = new Definition(Jwk_Set_Alias::class);
+        $definition->set_factory([new Reference(Jwk_Factory::class), 'createFromJsonObject']);
+        $definition->set_arguments([$config['value']]);
+        $definition->add_tag('jose.jwkset');
         return $definition;
     }
-
     #[Override]
-    public function getKeySet(): string
+    public function get_key_set(): string
     {
         return 'jwkset';
     }
-
     #[Override]
-    public function addConfiguration(NodeDefinition $node): void
+    public function add_configuration(Node_Definition $node): void
     {
-        parent::addConfiguration($node);
-        $node
-            ->children()
-            ->scalarNode('value')
-            ->info('The JWKSet object.')
-            ->isRequired()
-            ->end()
-            ->end();
+        parent::add_configuration($node);
+        $node->children()->scalar_node('value')->info('The JWKSet object.')->is_required()->end()->end();
     }
 }

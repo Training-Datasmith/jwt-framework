@@ -1,62 +1,48 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Console;
 
 use InvalidArgumentException;
-
 use function is_array;
 use function is_string;
-
-use Jose\Component\Core\JWKSet;
-use Jose\Component\Core\Util\JsonConverter;
+use Jose\Component\Core\Jwk_Set;
+use Jose\Component\Core\Util\Json_Converter;
 use Override;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
-#[AsCommand(
-    name: 'keyset:convert:public',
-    description: 'Convert private keys in a key set into public keys. Symmetric keys (shared keys) are not changed.',
-)]
-final class PublicKeysetCommand extends ObjectOutputCommand
+use Symfony\Component\Console\Attribute\As_Command;
+use Symfony\Component\Console\Input\Input_Argument;
+use Symfony\Component\Console\Input\Input_Interface;
+use Symfony\Component\Console\Output\Output_Interface;
+#[As_Command(name: 'keyset:convert:public', description: 'Convert private keys in a key set into public keys. Symmetric keys (shared keys) are not changed.')]
+final class Public_Keyset_Command extends Object_Output_Command
 {
     #[Override]
     protected function configure(): void
     {
         parent::configure();
-        $this
-            ->setHelp('This command converts private keys in a key set into public keys.')
-            ->addArgument('jwkset', InputArgument::REQUIRED, 'The JWKSet object');
+        $this->set_help('This command converts private keys in a key set into public keys.')->add_argument('jwkset', Input_Argument::REQUIRED, 'The JWKSet object');
     }
-
     #[Override]
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(Input_Interface $input, Output_Interface $output): int
     {
-        $jwkset = $this->getKeyset($input);
-        $newJwkset = new JWKSet([]);
-
+        $jwkset = $this->get_keyset($input);
+        $new_jwkset = new Jwk_Set([]);
         foreach ($jwkset->all() as $jwk) {
-            $newJwkset = $newJwkset->with($jwk->toPublic());
+            $new_jwkset = $new_jwkset->with($jwk->to_public());
         }
-        $this->prepareJsonOutput($input, $output, $newJwkset);
-
+        $this->prepare_json_output($input, $output, $new_jwkset);
         return self::SUCCESS;
     }
-
-    private function getKeyset(InputInterface $input): JWKSet
+    private function get_keyset(Input_Interface $input): Jwk_Set
     {
-        $jwkset = $input->getArgument('jwkset');
-        if (! is_string($jwkset)) {
+        $jwkset = $input->get_argument('jwkset');
+        if (!is_string($jwkset)) {
             throw new InvalidArgumentException('Invalid JWKSet');
         }
-        $json = JsonConverter::decode($jwkset);
-        if (! is_array($json)) {
+        $json = Json_Converter::decode($jwkset);
+        if (!is_array($json)) {
             throw new InvalidArgumentException('Invalid JWKSet');
         }
-
-        return JWKSet::createFromKeyData($json);
+        return Jwk_Set::create_from_key_data($json);
     }
 }

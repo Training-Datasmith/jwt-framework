@@ -1,65 +1,52 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Jose\Bundle\JoseFramework\DependencyInjection\Source\NestedToken;
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Nested_Token;
 
 use function array_key_exists;
 use function count;
-
-use Jose\Bundle\JoseFramework\DependencyInjection\Source\Source;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Source;
 use Override;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-
-final readonly class NestedToken implements Source
+use Symfony\Component\Config\Definition\Builder\Node_Definition;
+use Symfony\Component\Config\File_Locator;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+use Symfony\Component\Dependency_Injection\Loader\Php_File_Loader;
+final readonly class Nested_Token implements Source
 {
     /**
      * @var Source[]
      */
     private readonly array $sources;
-
     public function __construct()
     {
-        $this->sources = [new NestedTokenLoader(), new NestedTokenBuilder()];
+        $this->sources = [new Nested_Token_Loader(), new Nested_Token_Builder()];
     }
-
     #[Override]
     public function name(): string
     {
         return 'nested_token';
     }
-
     #[Override]
-    public function load(array $configs, ContainerBuilder $container): void
+    public function load(array $configs, Container_Builder $container): void
     {
-        $loader = new PhpFileLoader($container, new FileLocator(__DIR__ . '/../../../Resources/config'));
+        $loader = new Php_File_Loader($container, new File_Locator(__DIR__ . '/../../../Resources/config'));
         $loader->load('nested_token.php');
-
         if (array_key_exists('nested_token', $configs)) {
             foreach ($this->sources as $source) {
                 $source->load($configs['nested_token'], $container);
             }
         }
     }
-
     #[Override]
-    public function getNodeDefinition(NodeDefinition $node): void
+    public function get_node_definition(Node_Definition $node): void
     {
-        $childNode = $node->children()
-            ->arrayNode($this->name())
-            ->treatNullLike([])
-            ->treatFalseLike([]);
-
+        $child_node = $node->children()->array_node($this->name())->treat_null_like([])->treat_false_like([]);
         foreach ($this->sources as $source) {
-            $source->getNodeDefinition($childNode);
+            $source->get_node_definition($child_node);
         }
     }
-
     #[Override]
-    public function prepend(ContainerBuilder $container, array $config): array
+    public function prepend(Container_Builder $container, array $config): array
     {
         $result = [];
         foreach ($this->sources as $source) {
@@ -68,7 +55,6 @@ final readonly class NestedToken implements Source
                 $result[$source->name()] = $prepend;
             }
         }
-
         return $result;
     }
 }

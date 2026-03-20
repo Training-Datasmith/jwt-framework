@@ -1,21 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Signature\Serializer;
 
 use InvalidArgumentException;
 use Jose\Component\Signature\JWS;
-
 use function sprintf;
-
-final class JWSSerializerManager
+final class Jws_Serializer_Manager
 {
     /**
      * @var JWSSerializer[]
      */
     private array $serializers = [];
-
     /**
      * @param JWSSerializer[] $serializers
      */
@@ -25,7 +21,6 @@ final class JWSSerializerManager
             $this->add($serializer);
         }
     }
-
     /**
      * @return string[]
      */
@@ -33,19 +28,16 @@ final class JWSSerializerManager
     {
         return array_keys($this->serializers);
     }
-
     /**
      * Converts a JWS into a string.
      */
-    public function serialize(string $name, JWS $jws, ?int $signatureIndex = null): string
+    public function serialize(string $name, JWS $jws, ?int $signature_index = null): string
     {
-        if (! isset($this->serializers[$name])) {
+        if (!isset($this->serializers[$name])) {
             throw new InvalidArgumentException(sprintf('Unsupported serializer "%s".', $name));
         }
-
-        return $this->serializers[$name]->serialize($jws, $signatureIndex);
+        return $this->serializers[$name]->serialize($jws, $signature_index);
     }
-
     /**
      * Loads data and return a JWS object.
      *
@@ -58,17 +50,14 @@ final class JWSSerializerManager
             try {
                 $jws = $serializer->unserialize($input);
                 $name = $serializer->name();
-
                 return $jws;
             } catch (InvalidArgumentException) {
                 continue;
             }
         }
-
         throw new InvalidArgumentException('Unsupported input.');
     }
-
-    private function add(JWSSerializer $serializer): void
+    private function add(Jws_Serializer $serializer): void
     {
         $this->serializers[$serializer->name()] = $serializer;
     }

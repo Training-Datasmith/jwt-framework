@@ -1,58 +1,39 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Key_Management\Jwk_Set_Source;
 
-namespace Jose\Bundle\JoseFramework\DependencyInjection\Source\KeyManagement\JWKSetSource;
-
-use Jose\Bundle\JoseFramework\DependencyInjection\Source\AbstractSource;
-use Jose\Component\Core\JWKSet;
-use Jose\Component\KeyManagement\JKUFactory;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Abstract_Source;
+use Jose\Component\Core\Jwk_Set;
+use Jose\Component\Key_Management\Jku_Factory;
 use Override;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
-final readonly class JKU extends AbstractSource implements JWKSetSource
+use Symfony\Component\Config\Definition\Builder\Node_Definition;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+use Symfony\Component\Dependency_Injection\Definition;
+use Symfony\Component\Dependency_Injection\Reference;
+final readonly class JKU extends Abstract_Source implements Jwk_Set_Source
 {
     /**
      * @param array<string, mixed> $config
      */
     #[Override]
-    public function createDefinition(ContainerBuilder $container, array $config): Definition
+    public function create_definition(Container_Builder $container, array $config): Definition
     {
-        $definition = new Definition(JWKSet::class);
-        $definition->setFactory([new Reference(JKUFactory::class), 'loadFromUrl']);
-        $definition->setArguments([$config['url'], $config['headers']]);
-        $definition->addTag('jose.jwkset');
-
+        $definition = new Definition(Jwk_Set::class);
+        $definition->set_factory([new Reference(Jku_Factory::class), 'loadFromUrl']);
+        $definition->set_arguments([$config['url'], $config['headers']]);
+        $definition->add_tag('jose.jwkset');
         return $definition;
     }
-
     #[Override]
-    public function getKeySet(): string
+    public function get_key_set(): string
     {
         return 'jku';
     }
-
     #[Override]
-    public function addConfiguration(NodeDefinition $node): void
+    public function add_configuration(Node_Definition $node): void
     {
-        parent::addConfiguration($node);
-        $node
-            ->children()
-            ->scalarNode('url')
-            ->info('URL of the key set.')
-            ->isRequired()
-            ->end()
-            ->arrayNode('headers')
-            ->treatNullLike([])
-            ->treatFalseLike([])
-            ->info('Header key/value pairs added to the request.')
-            ->useAttributeAsKey('name')
-            ->variablePrototype()
-            ->end()
-            ->end()
-            ->end();
+        parent::add_configuration($node);
+        $node->children()->scalar_node('url')->info('URL of the key set.')->is_required()->end()->array_node('headers')->treat_null_like([])->treat_false_like([])->info('Header key/value pairs added to the request.')->use_attribute_as_key('name')->variable_prototype()->end()->end()->end();
     }
 }

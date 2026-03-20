@@ -1,111 +1,91 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Jose\Experimental\KeyEncryption;
+declare (strict_types=1);
+namespace Jose\Experimental\Key_Encryption;
 
 use function in_array;
-
 use InvalidArgumentException;
-
 use function is_string;
-
 use Jose\Component\Core\JWK;
-use Jose\Component\Core\Util\Base64UrlSafe;
-use Jose\Component\Encryption\Algorithm\KeyEncryption\KeyEncryption;
+use Jose\Component\Core\Util\Base64url_Safe;
+use Jose\Component\Encryption\Algorithm\Key_Encryption\Key_Encryption;
 use LogicException;
-
 use const OPENSSL_RAW_DATA;
-
 use Override;
 use RuntimeException;
-
 use function strlen;
-
-final readonly class Chacha20Poly1305 implements KeyEncryption
+final readonly class Chacha20Poly1305 implements Key_Encryption
 {
     public function __construct()
     {
-        if (! in_array('chacha20-poly1305', openssl_get_cipher_methods(), true)) {
+        if (!in_array('chacha20-poly1305', openssl_get_cipher_methods(), true)) {
             throw new LogicException('The algorithm "chacha20-poly1305" is not supported in this platform.');
         }
     }
-
     #[Override]
-    public function allowedKeyTypes(): array
+    public function allowed_key_types(): array
     {
         return ['oct'];
     }
-
     #[Override]
     public function name(): string
     {
         return 'chacha20-poly1305';
     }
-
     /**
      * @param array<string, mixed> $completeHeader
      * @param array<string, mixed> $additionalHeader
      */
     #[Override]
-    public function encryptKey(JWK $key, string $cek, array $completeHeader, array &$additionalHeader): string
+    public function encrypt_key(JWK $key, string $cek, array $complete_header, array &$additional_header): string
     {
-        $k = $this->getKey($key);
+        $k = $this->get_key($key);
         $nonce = random_bytes(12);
-
         // We set header parameters
-        $additionalHeader['nonce'] = Base64UrlSafe::encodeUnpadded($nonce);
-
+        $additional_header['nonce'] = Base64url_Safe::encode_unpadded($nonce);
         $tag = null;
         $result = openssl_encrypt($cek, 'chacha20-poly1305', $k, OPENSSL_RAW_DATA, $nonce, $tag);
-        if ($result === false || ! is_string($tag)) {
+        if ($result === false || !is_string($tag)) {
             throw new RuntimeException('Unable to encrypt the CEK');
         }
-
         return $result;
     }
-
     /**
      * @param array<string, mixed> $header
      */
     #[Override]
-    public function decryptKey(JWK $key, string $encrypted_cek, array $header): string
+    public function decrypt_key(JWK $key, string $encrypted_cek, array $header): string
     {
-        $k = $this->getKey($key);
+        $k = $this->get_key($key);
         isset($header['nonce']) || throw new InvalidArgumentException('The header parameter "nonce" is missing.');
         is_string($header['nonce']) || throw new InvalidArgumentException('The header parameter "nonce" is not valid.');
-        $nonce = Base64UrlSafe::decodeNoPadding($header['nonce']);
+        $nonce = Base64url_Safe::decode_no_padding($header['nonce']);
         if (strlen($nonce) !== 12) {
             throw new InvalidArgumentException('The header parameter "nonce" is not valid.');
         }
-
         $result = openssl_decrypt($encrypted_cek, 'chacha20-poly1305', $k, OPENSSL_RAW_DATA, $nonce);
         if ($result === false) {
             throw new RuntimeException('Unable to decrypt the CEK');
         }
-
         return $result;
     }
-
     #[Override]
-    public function getKeyManagementMode(): string
+    public function get_key_management_mode(): string
     {
         return self::MODE_ENCRYPT;
     }
-
-    private function getKey(JWK $key): string
+    private function get_key(JWK $key): string
     {
-        if (! in_array($key->get('kty'), $this->allowedKeyTypes(), true)) {
+        if (!in_array($key->get('kty'), $this->allowed_key_types(), true)) {
             throw new InvalidArgumentException('Wrong key type.');
         }
-        if (! $key->has('k')) {
+        if (!$key->has('k')) {
             throw new InvalidArgumentException('The key parameter "k" is missing.');
         }
         $k = $key->get('k');
-        if (! is_string($k)) {
+        if (!is_string($k)) {
             throw new InvalidArgumentException('The key parameter "k" is invalid.');
         }
-
-        return Base64UrlSafe::decodeNoPadding($k);
+        return Base64url_Safe::decode_no_padding($k);
     }
 }

@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Signature\Algorithm;
 
 use Override;
-
 final readonly class ES512 extends ECDSA
 {
     #[Override]
@@ -13,15 +11,13 @@ final readonly class ES512 extends ECDSA
     {
         return 'ES512';
     }
-
     #[Override]
-    protected function getHashAlgorithm(): string
+    protected function get_hash_algorithm(): string
     {
         return 'sha512';
     }
-
     #[Override]
-    protected function getSignaturePartLength(): int
+    protected function get_signature_part_length(): int
     {
         return 132;
     }

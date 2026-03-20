@@ -1,53 +1,39 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Key_Management\Jwk_Source;
 
-namespace Jose\Bundle\JoseFramework\DependencyInjection\Source\KeyManagement\JWKSource;
-
-use Jose\Bundle\JoseFramework\DependencyInjection\Source\AbstractSource;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Abstract_Source;
 use Jose\Component\Core\JWK;
-use Jose\Component\KeyManagement\JWKFactory;
+use Jose\Component\Key_Management\Jwk_Factory;
 use Override;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
-final readonly class Values extends AbstractSource implements JWKSource
+use Symfony\Component\Config\Definition\Builder\Node_Definition;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+use Symfony\Component\Dependency_Injection\Definition;
+use Symfony\Component\Dependency_Injection\Reference;
+final readonly class Values extends Abstract_Source implements Jwk_Source
 {
     /**
      * @param array<string, mixed> $config
      */
     #[Override]
-    public function createDefinition(ContainerBuilder $container, array $config): Definition
+    public function create_definition(Container_Builder $container, array $config): Definition
     {
         $definition = new Definition(JWK::class);
-        $definition->setFactory([new Reference(JWKFactory::class), 'createFromValues']);
-        $definition->setArguments([$config['values']]);
-        $definition->addTag('jose.jwk');
-
+        $definition->set_factory([new Reference(Jwk_Factory::class), 'createFromValues']);
+        $definition->set_arguments([$config['values']]);
+        $definition->add_tag('jose.jwk');
         return $definition;
     }
-
     #[Override]
-    public function getKey(): string
+    public function get_key(): string
     {
         return 'values';
     }
-
     #[Override]
-    public function addConfiguration(NodeDefinition $node): void
+    public function add_configuration(Node_Definition $node): void
     {
-        parent::addConfiguration($node);
-        $node
-            ->children()
-            ->arrayNode('values')
-            ->info('Values of the key.')
-            ->isRequired()
-            ->useAttributeAsKey('key')
-            ->variablePrototype()
-            ->end()
-            ->end()
-            ->end();
+        parent::add_configuration($node);
+        $node->children()->array_node('values')->info('Values of the key.')->is_required()->use_attribute_as_key('key')->variable_prototype()->end()->end()->end();
     }
 }

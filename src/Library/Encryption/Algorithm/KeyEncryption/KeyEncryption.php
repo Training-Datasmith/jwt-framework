@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Jose\Component\Encryption\Algorithm\KeyEncryption;
+declare (strict_types=1);
+namespace Jose\Component\Encryption\Algorithm\Key_Encryption;
 
 use Jose\Component\Core\JWK;
-use Jose\Component\Encryption\Algorithm\KeyEncryptionAlgorithm;
-
-interface KeyEncryption extends KeyEncryptionAlgorithm
+use Jose\Component\Encryption\Algorithm\Key_Encryption_Algorithm;
+interface Key_Encryption extends Key_Encryption_Algorithm
 {
     /**
      * Encrypt the CEK.
@@ -17,8 +15,7 @@ interface KeyEncryption extends KeyEncryptionAlgorithm
      * @param array<string, mixed> $completeHeader The complete header of the JWT
      * @param array<string, mixed> $additionalHeader Additional header
      */
-    public function encryptKey(JWK $key, string $cek, array $completeHeader, array &$additionalHeader): string;
-
+    public function encrypt_key(JWK $key, string $cek, array $complete_header, array &$additional_header): string;
     /**
      * Decrypt de CEK.
      *
@@ -26,5 +23,5 @@ interface KeyEncryption extends KeyEncryptionAlgorithm
      * @param string $encrypted_cek The CEK to decrypt
      * @param array<string, mixed> $header The complete header of the JWT
      */
-    public function decryptKey(JWK $key, string $encrypted_cek, array $header): string;
+    public function decrypt_key(JWK $key, string $encrypted_cek, array $header): string;
 }

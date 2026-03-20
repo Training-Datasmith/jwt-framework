@@ -1,134 +1,45 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Nested_Token;
 
-namespace Jose\Bundle\JoseFramework\DependencyInjection\Source\NestedToken;
-
-use Jose\Bundle\JoseFramework\DependencyInjection\Source\Source;
-use Jose\Bundle\JoseFramework\Services\NestedTokenLoaderFactory;
-use Jose\Component\NestedToken\NestedTokenLoader as NestedTokenLoaderService;
+use Jose\Bundle\Jose_Framework\Dependency_Injection\Source\Source;
+use Jose\Bundle\Jose_Framework\Services\Nested_Token_Loader_Factory;
+use Jose\Component\Nested_Token\Nested_Token_Loader as NestedTokenLoaderService;
 use Override;
-
 use function sprintf;
-
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
-final readonly class NestedTokenLoader implements Source
+use Symfony\Component\Config\Definition\Builder\Node_Definition;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+use Symfony\Component\Dependency_Injection\Definition;
+use Symfony\Component\Dependency_Injection\Reference;
+final readonly class Nested_Token_Loader implements Source
 {
     #[Override]
     public function name(): string
     {
         return 'loaders';
     }
-
     #[Override]
-    public function load(array $configs, ContainerBuilder $container): void
+    public function load(array $configs, Container_Builder $container): void
     {
-        foreach ($configs[$this->name()] as $name => $itemConfig) {
+        foreach ($configs[$this->name()] as $name => $item_config) {
             $service_id = sprintf('jose.nested_token_loader.%s', $name);
-            $definition = new Definition(NestedTokenLoaderService::class);
-            $definition
-                ->setFactory([new Reference(NestedTokenLoaderFactory::class), 'create'])
-                ->setArguments([
-                    $itemConfig['jwe_serializers'],
-                    $itemConfig['encryption_algorithms'],
-                    $itemConfig['jwe_header_checkers'],
-                    $itemConfig['jws_serializers'],
-                    $itemConfig['signature_algorithms'],
-                    $itemConfig['jws_header_checkers'],
-                ])
-                ->addTag('jose.nested_token_loader')
-                ->setPublic($itemConfig['is_public']);
-            foreach ($itemConfig['tags'] as $id => $attributes) {
-                $definition->addTag($id, $attributes);
+            $definition = new Definition(Nested_Token_Loader_Service::class);
+            $definition->set_factory([new Reference(Nested_Token_Loader_Factory::class), 'create'])->set_arguments([$item_config['jwe_serializers'], $item_config['encryption_algorithms'], $item_config['jwe_header_checkers'], $item_config['jws_serializers'], $item_config['signature_algorithms'], $item_config['jws_header_checkers']])->add_tag('jose.nested_token_loader')->set_public($item_config['is_public']);
+            foreach ($item_config['tags'] as $id => $attributes) {
+                $definition->add_tag($id, $attributes);
             }
-            $container->setDefinition($service_id, $definition);
-            $container->registerAliasForArgument($service_id, self::class, $name . 'NestedTokenLoader');
+            $container->set_definition($service_id, $definition);
+            $container->register_alias_for_argument($service_id, self::class, $name . 'NestedTokenLoader');
         }
     }
-
     #[Override]
-    public function getNodeDefinition(NodeDefinition $node): void
+    public function get_node_definition(Node_Definition $node): void
     {
-        $node->children()
-            ->arrayNode($this->name())
-            ->treatNullLike([])
-            ->treatFalseLike([])
-            ->useAttributeAsKey('name')
-            ->arrayPrototype()
-            ->children()
-            ->booleanNode('is_public')
-            ->info('If true, the service will be public, else private.')
-            ->defaultTrue()
-            ->end()
-            ->arrayNode('signature_algorithms')
-            ->info('A list of signature algorithm aliases.')
-            ->useAttributeAsKey('name')
-            ->isRequired()
-            ->scalarPrototype()
-            ->end()
-            ->end()
-            ->arrayNode('encryption_algorithms')
-            ->info('A list of encryption algorithm aliases.')
-            ->useAttributeAsKey('name')
-            ->isRequired()
-            ->scalarPrototype()
-            ->end()
-            ->end()
-            ->arrayNode('jws_serializers')
-            ->info('A list of JWS serializer aliases.')
-            ->useAttributeAsKey('name')
-            ->treatNullLike([])
-            ->treatFalseLike([])
-            ->isRequired()
-            ->requiresAtLeastOneElement()
-            ->scalarPrototype()
-            ->end()
-            ->end()
-            ->arrayNode('jwe_serializers')
-            ->info('A list of JWE serializer aliases.')
-            ->useAttributeAsKey('name')
-            ->treatNullLike([])
-            ->treatFalseLike([])
-            ->isRequired()
-            ->requiresAtLeastOneElement()
-            ->scalarPrototype()
-            ->end()
-            ->end()
-            ->arrayNode('jws_header_checkers')
-            ->info('A list of header checker aliases.')
-            ->useAttributeAsKey('name')
-            ->treatNullLike([])
-            ->treatFalseLike([])
-            ->scalarPrototype()
-            ->end()
-            ->end()
-            ->arrayNode('jwe_header_checkers')
-            ->info('A list of header checker aliases.')
-            ->useAttributeAsKey('name')
-            ->treatNullLike([])
-            ->treatFalseLike([])
-            ->scalarPrototype()
-            ->end()
-            ->end()
-            ->arrayNode('tags')
-            ->info('A list of tags to be associated to the service.')
-            ->useAttributeAsKey('name')
-            ->treatNullLike([])
-            ->treatFalseLike([])
-            ->variablePrototype()
-            ->end()
-            ->end()
-            ->end()
-            ->end()
-            ->end();
+        $node->children()->array_node($this->name())->treat_null_like([])->treat_false_like([])->use_attribute_as_key('name')->array_prototype()->children()->boolean_node('is_public')->info('If true, the service will be public, else private.')->default_true()->end()->array_node('signature_algorithms')->info('A list of signature algorithm aliases.')->use_attribute_as_key('name')->is_required()->scalar_prototype()->end()->end()->array_node('encryption_algorithms')->info('A list of encryption algorithm aliases.')->use_attribute_as_key('name')->is_required()->scalar_prototype()->end()->end()->array_node('jws_serializers')->info('A list of JWS serializer aliases.')->use_attribute_as_key('name')->treat_null_like([])->treat_false_like([])->is_required()->requires_at_least_one_element()->scalar_prototype()->end()->end()->array_node('jwe_serializers')->info('A list of JWE serializer aliases.')->use_attribute_as_key('name')->treat_null_like([])->treat_false_like([])->is_required()->requires_at_least_one_element()->scalar_prototype()->end()->end()->array_node('jws_header_checkers')->info('A list of header checker aliases.')->use_attribute_as_key('name')->treat_null_like([])->treat_false_like([])->scalar_prototype()->end()->end()->array_node('jwe_header_checkers')->info('A list of header checker aliases.')->use_attribute_as_key('name')->treat_null_like([])->treat_false_like([])->scalar_prototype()->end()->end()->array_node('tags')->info('A list of tags to be associated to the service.')->use_attribute_as_key('name')->treat_null_like([])->treat_false_like([])->variable_prototype()->end()->end()->end()->end()->end();
     }
-
     #[Override]
-    public function prepend(ContainerBuilder $container, array $config): array
+    public function prepend(Container_Builder $container, array $config): array
     {
         return [];
     }

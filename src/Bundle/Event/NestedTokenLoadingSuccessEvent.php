@@ -1,45 +1,33 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Event;
 
-namespace Jose\Bundle\JoseFramework\Event;
-
-use Jose\Component\Core\JWKSet;
+use Jose\Component\Core\Jwk_Set;
 use Jose\Component\Signature\JWS;
-use Symfony\Contracts\EventDispatcher\Event;
-
-final class NestedTokenLoadingSuccessEvent extends Event
+use Symfony\Contracts\Event_Dispatcher\Event;
+final class Nested_Token_Loading_Success_Event extends Event
 {
-    public function __construct(
-        private readonly string $token,
-        private readonly JWS $jws,
-        private readonly JWKSet $signatureKeySet,
-        private readonly JWKSet $encryptionKeySet,
-        private readonly int $signature
-    ) {
+    public function __construct(private readonly string $token, private readonly JWS $jws, private readonly Jwk_Set $signature_key_set, private readonly Jwk_Set $encryption_key_set, private readonly int $signature)
+    {
     }
-
-    public function getJws(): JWS
+    public function get_jws(): JWS
     {
         return $this->jws;
     }
-
-    public function getToken(): string
+    public function get_token(): string
     {
         return $this->token;
     }
-
-    public function getSignatureKeySet(): JWKSet
+    public function get_signature_key_set(): Jwk_Set
     {
-        return $this->signatureKeySet;
+        return $this->signature_key_set;
     }
-
-    public function getEncryptionKeySet(): JWKSet
+    public function get_encryption_key_set(): Jwk_Set
     {
-        return $this->encryptionKeySet;
+        return $this->encryption_key_set;
     }
-
-    public function getSignature(): int
+    public function get_signature(): int
     {
         return $this->signature;
     }

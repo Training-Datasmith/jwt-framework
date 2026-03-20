@@ -1,31 +1,18 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Services;
 
-namespace Jose\Bundle\JoseFramework\Services;
-
-use Psr\EventDispatcher\EventDispatcherInterface;
-
-final readonly class NestedTokenLoaderFactory
+use Psr\Event_Dispatcher\Event_Dispatcher_Interface;
+final readonly class Nested_Token_Loader_Factory
 {
-    public function __construct(
-        private readonly JWELoaderFactory $jweLoaderFactory,
-        private readonly JWSLoaderFactory $jwsLoaderFactory,
-        private readonly EventDispatcherInterface $eventDispatcher
-    ) {
+    public function __construct(private readonly Jwe_Loader_Factory $jwe_loader_factory, private readonly Jws_Loader_Factory $jws_loader_factory, private readonly Event_Dispatcher_Interface $event_dispatcher)
+    {
     }
-
-    public function create(
-        array $jweSerializers,
-        array $encryptionAlgorithms,
-        array $jweHeaderCheckers,
-        array $jwsSerializers,
-        array $signatureAlgorithms,
-        array $jwsHeaderCheckers
-    ): NestedTokenLoader {
-        $jweLoader = $this->jweLoaderFactory->create($jweSerializers, $encryptionAlgorithms, $jweHeaderCheckers);
-        $jwsLoader = $this->jwsLoaderFactory->create($jwsSerializers, $signatureAlgorithms, $jwsHeaderCheckers);
-
-        return new NestedTokenLoader($jweLoader, $jwsLoader, $this->eventDispatcher);
+    public function create(array $jwe_serializers, array $encryption_algorithms, array $jwe_header_checkers, array $jws_serializers, array $signature_algorithms, array $jws_header_checkers): Nested_Token_Loader
+    {
+        $jwe_loader = $this->jwe_loader_factory->create($jwe_serializers, $encryption_algorithms, $jwe_header_checkers);
+        $jws_loader = $this->jws_loader_factory->create($jws_serializers, $signature_algorithms, $jws_header_checkers);
+        return new Nested_Token_Loader($jwe_loader, $jws_loader, $this->event_dispatcher);
     }
 }

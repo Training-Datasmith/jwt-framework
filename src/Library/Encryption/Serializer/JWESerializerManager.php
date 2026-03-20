@@ -1,21 +1,17 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Encryption\Serializer;
 
 use InvalidArgumentException;
 use Jose\Component\Encryption\JWE;
-
 use function sprintf;
-
-final class JWESerializerManager
+final class Jwe_Serializer_Manager
 {
     /**
      * @var JWESerializer[]
      */
     private array $serializers = [];
-
     /**
      * @param JWESerializer[] $serializers
      */
@@ -25,7 +21,6 @@ final class JWESerializerManager
             $this->add($serializer);
         }
     }
-
     /**
      * Return the serializer names supported by the manager.
      *
@@ -35,19 +30,16 @@ final class JWESerializerManager
     {
         return array_keys($this->serializers);
     }
-
     /**
      * Converts a JWE into a string. Throws an exception if none of the serializer was able to convert the input.
      */
-    public function serialize(string $name, JWE $jws, ?int $recipientIndex = null): string
+    public function serialize(string $name, JWE $jws, ?int $recipient_index = null): string
     {
-        if (! isset($this->serializers[$name])) {
+        if (!isset($this->serializers[$name])) {
             throw new InvalidArgumentException(sprintf('Unsupported serializer "%s".', $name));
         }
-
-        return $this->serializers[$name]->serialize($jws, $recipientIndex);
+        return $this->serializers[$name]->serialize($jws, $recipient_index);
     }
-
     /**
      * Loads data and return a JWE object. Throws an exception if none of the serializer was able to convert the input.
      *
@@ -60,20 +52,17 @@ final class JWESerializerManager
             try {
                 $jws = $serializer->unserialize($input);
                 $name = $serializer->name();
-
                 return $jws;
             } catch (InvalidArgumentException) {
                 continue;
             }
         }
-
         throw new InvalidArgumentException('Unsupported input.');
     }
-
     /**
      * Adds a serializer to the manager.
      */
-    private function add(JWESerializer $serializer): void
+    private function add(Jwe_Serializer $serializer): void
     {
         $this->serializers[$serializer->name()] = $serializer;
     }

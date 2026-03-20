@@ -1,40 +1,34 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Component\Key_Management\Analyzer;
 
-namespace Jose\Component\KeyManagement\Analyzer;
-
-use Jose\Component\Core\JWKSet;
+use Jose\Component\Core\Jwk_Set;
 use Override;
-
-final readonly class MixedPublicAndPrivateKeys implements KeysetAnalyzer
+final readonly class Mixed_Public_And_Private_Keys implements Keyset_Analyzer
 {
     #[Override]
-    public function analyze(JWKSet $jwkset, MessageBag $bag): void
+    public function analyze(Jwk_Set $jwkset, Message_Bag $bag): void
     {
         if ($jwkset->count() === 0) {
             return;
         }
-
-        $hasPublicKeys = false;
-        $hasPrivateKeys = false;
-
+        $has_public_keys = false;
+        $has_private_keys = false;
         foreach ($jwkset as $jwk) {
             switch ($jwk->get('kty')) {
                 case 'OKP':
                 case 'RSA':
                 case 'EC':
                     if ($jwk->has('d')) {
-                        $hasPrivateKeys = true;
+                        $has_private_keys = true;
                     } else {
-                        $hasPublicKeys = true;
+                        $has_public_keys = true;
                     }
-
                     break;
             }
         }
-
-        if ($hasPrivateKeys && $hasPublicKeys) {
+        if ($has_private_keys && $has_public_keys) {
             $bag->add(Message::high('This key set mixes public and private keys.'));
         }
     }

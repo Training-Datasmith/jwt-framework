@@ -1,65 +1,53 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Checker;
 
 use function in_array;
 use function is_string;
-
 use Override;
-
 /**
  * This class is a header parameter and claim checker.
  *
  * When the "iss" header parameter or claim is present, it will check if the value is within the allowed ones.
  */
-final readonly class IssuerChecker implements ClaimChecker, HeaderChecker
+final readonly class Issuer_Checker implements Claim_Checker, Header_Checker
 {
     private const CLAIM_NAME = 'iss';
-
-    public function __construct(
-        private array $issuers,
-        private bool $protectedHeader = false
-    ) {
-    }
-
-    #[Override]
-    public function checkClaim(mixed $value): void
+    public function __construct(private array $issuers, private bool $protected_header = false)
     {
-        $this->checkValue($value, InvalidClaimException::class);
     }
-
     #[Override]
-    public function checkHeader(mixed $value): void
+    public function check_claim(mixed $value): void
     {
-        $this->checkValue($value, InvalidHeaderException::class);
+        $this->check_value($value, Invalid_Claim_Exception::class);
     }
-
     #[Override]
-    public function supportedClaim(): string
+    public function check_header(mixed $value): void
+    {
+        $this->check_value($value, Invalid_Header_Exception::class);
+    }
+    #[Override]
+    public function supported_claim(): string
     {
         return self::CLAIM_NAME;
     }
-
     #[Override]
-    public function supportedHeader(): string
+    public function supported_header(): string
     {
         return self::CLAIM_NAME;
     }
-
     #[Override]
-    public function protectedHeaderOnly(): bool
+    public function protected_header_only(): bool
     {
-        return $this->protectedHeader;
+        return $this->protected_header;
     }
-
-    private function checkValue(mixed $value, string $class): void
+    private function check_value(mixed $value, string $class): void
     {
-        if (! is_string($value)) {
+        if (!is_string($value)) {
             throw new $class('Invalid value.', self::CLAIM_NAME, $value);
         }
-        if (! in_array($value, $this->issuers, true)) {
+        if (!in_array($value, $this->issuers, true)) {
             throw new $class('Unknown issuer.', self::CLAIM_NAME, $value);
         }
     }

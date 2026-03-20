@@ -1,93 +1,75 @@
 <?php
 
-declare(strict_types=1);
-
-namespace Jose\Experimental\KeyEncryption;
+declare (strict_types=1);
+namespace Jose\Experimental\Key_Encryption;
 
 use function in_array;
-
 use InvalidArgumentException;
-
 use function is_string;
-
 use Jose\Component\Core\JWK;
-use Jose\Component\Core\Util\Base64UrlSafe;
-use Jose\Component\Encryption\Algorithm\KeyEncryption\KeyEncryption;
-
+use Jose\Component\Core\Util\Base64url_Safe;
+use Jose\Component\Encryption\Algorithm\Key_Encryption\Key_Encryption;
 use const OPENSSL_RAW_DATA;
-
 use Override;
 use RuntimeException;
-
-abstract readonly class AESCTR implements KeyEncryption
+abstract readonly class AESCTR implements Key_Encryption
 {
     #[Override]
-    public function allowedKeyTypes(): array
+    public function allowed_key_types(): array
     {
         return ['oct'];
     }
-
     /**
      * @param array<string, mixed> $completeHeader
      * @param array<string, mixed> $additionalHeader
      */
     #[Override]
-    public function encryptKey(JWK $key, string $cek, array $completeHeader, array &$additionalHeader): string
+    public function encrypt_key(JWK $key, string $cek, array $complete_header, array &$additional_header): string
     {
-        $k = $this->getKey($key);
+        $k = $this->get_key($key);
         $iv = random_bytes(16);
-
         // We set header parameters
-        $additionalHeader['iv'] = Base64UrlSafe::encodeUnpadded($iv);
-
-        $result = openssl_encrypt($cek, $this->getMode(), $k, OPENSSL_RAW_DATA, $iv);
+        $additional_header['iv'] = Base64url_Safe::encode_unpadded($iv);
+        $result = openssl_encrypt($cek, $this->get_mode(), $k, OPENSSL_RAW_DATA, $iv);
         if ($result === false) {
             throw new RuntimeException('Unable to encrypt the CEK');
         }
-
         return $result;
     }
-
     /**
      * @param array<string, mixed> $header
      */
     #[Override]
-    public function decryptKey(JWK $key, string $encrypted_cek, array $header): string
+    public function decrypt_key(JWK $key, string $encrypted_cek, array $header): string
     {
-        $k = $this->getKey($key);
+        $k = $this->get_key($key);
         isset($header['iv']) || throw new InvalidArgumentException('The header parameter "iv" is missing.');
         is_string($header['iv']) || throw new InvalidArgumentException('The header parameter "iv" is not valid.');
-        $iv = Base64UrlSafe::decodeNoPadding($header['iv']);
-
-        $result = openssl_decrypt($encrypted_cek, $this->getMode(), $k, OPENSSL_RAW_DATA, $iv);
+        $iv = Base64url_Safe::decode_no_padding($header['iv']);
+        $result = openssl_decrypt($encrypted_cek, $this->get_mode(), $k, OPENSSL_RAW_DATA, $iv);
         if ($result === false) {
             throw new RuntimeException('Unable to decrypt the CEK');
         }
-
         return $result;
     }
-
     #[Override]
-    public function getKeyManagementMode(): string
+    public function get_key_management_mode(): string
     {
         return self::MODE_ENCRYPT;
     }
-
-    abstract protected function getMode(): string;
-
-    private function getKey(JWK $key): string
+    abstract protected function get_mode(): string;
+    private function get_key(JWK $key): string
     {
-        if (! in_array($key->get('kty'), $this->allowedKeyTypes(), true)) {
+        if (!in_array($key->get('kty'), $this->allowed_key_types(), true)) {
             throw new InvalidArgumentException('Wrong key type.');
         }
-        if (! $key->has('k')) {
+        if (!$key->has('k')) {
             throw new InvalidArgumentException('The key parameter "k" is missing.');
         }
         $k = $key->get('k');
-        if (! is_string($k)) {
+        if (!is_string($k)) {
             throw new InvalidArgumentException('The key parameter "k" is invalid.');
         }
-
-        return Base64UrlSafe::decodeNoPadding($k);
+        return Base64url_Safe::decode_no_padding($k);
     }
 }

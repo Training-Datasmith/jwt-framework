@@ -1,15 +1,12 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Signature;
 
 use function count;
-
 use InvalidArgumentException;
 use Jose\Component\Core\JWT;
 use Override;
-
 /**
  * @see \Jose\Tests\Component\Signature\JWSTest
  */
@@ -19,62 +16,50 @@ class JWS implements JWT
      * @var Signature[]
      */
     private array $signatures = [];
-
-    public function __construct(
-        private readonly ?string $payload,
-        private readonly ?string $encodedPayload = null,
-        private readonly bool $isPayloadDetached = false
-    ) {
+    public function __construct(private readonly ?string $payload, private readonly ?string $encoded_payload = null, private readonly bool $is_payload_detached = false)
+    {
     }
-
     #[Override]
-    public function getPayload(): ?string
+    public function get_payload(): ?string
     {
         return $this->payload;
     }
-
     /**
      * Returns true if the payload is detached.
      */
-    public function isPayloadDetached(): bool
+    public function is_payload_detached(): bool
     {
-        return $this->isPayloadDetached;
+        return $this->is_payload_detached;
     }
-
     /**
      * Returns the Base64Url encoded payload. If the payload is detached, this method returns null.
      */
-    public function getEncodedPayload(): ?string
+    public function get_encoded_payload(): ?string
     {
-        if ($this->isPayloadDetached() === true) {
+        if ($this->is_payload_detached() === true) {
             return null;
         }
-
-        return $this->encodedPayload;
+        return $this->encoded_payload;
     }
-
     /**
      * Returns the signatures associated with the JWS.
      *
      * @return Signature[]
      */
-    public function getSignatures(): array
+    public function get_signatures(): array
     {
         return $this->signatures;
     }
-
     /**
      * Returns the signature at the given index.
      */
-    public function getSignature(int $id): Signature
+    public function get_signature(int $id): Signature
     {
         if (isset($this->signatures[$id])) {
             return $this->signatures[$id];
         }
-
         throw new InvalidArgumentException('The signature does not exist.');
     }
-
     /**
      * This method adds a signature to the JWS object. Its returns a new JWS object.
      *
@@ -83,26 +68,19 @@ class JWS implements JWT
      * @param array{alg?: string, string?: mixed} $protectedHeader
      * @param array{alg?: string, string?: mixed} $header
      */
-    public function addSignature(
-        string $signature,
-        array $protectedHeader,
-        ?string $encodedProtectedHeader,
-        array $header = []
-    ): self {
+    public function add_signature(string $signature, array $protected_header, ?string $encoded_protected_header, array $header = []): self
+    {
         $jws = clone $this;
-        $jws->signatures[] = new Signature($signature, $protectedHeader, $encodedProtectedHeader, $header);
-
+        $jws->signatures[] = new Signature($signature, $protected_header, $encoded_protected_header, $header);
         return $jws;
     }
-
     /**
      * Returns the number of signature associated with the JWS.
      */
-    public function countSignatures(): int
+    public function count_signatures(): int
     {
         return count($this->signatures);
     }
-
     /**
      * This method splits the JWS into a list of JWSs. It is only useful when the JWS contains more than one signature
      * (JSON General Serialization).
@@ -113,17 +91,10 @@ class JWS implements JWT
     {
         $result = [];
         foreach ($this->signatures as $signature) {
-            $jws = new self($this->payload, $this->encodedPayload, $this->isPayloadDetached);
-            $jws = $jws->addSignature(
-                $signature->getSignature(),
-                $signature->getProtectedHeader(),
-                $signature->getEncodedProtectedHeader(),
-                $signature->getHeader()
-            );
-
+            $jws = new self($this->payload, $this->encoded_payload, $this->is_payload_detached);
+            $jws = $jws->add_signature($signature->get_signature(), $signature->get_protected_header(), $signature->get_encoded_protected_header(), $signature->get_header());
             $result[] = $jws;
         }
-
         return $result;
     }
 }

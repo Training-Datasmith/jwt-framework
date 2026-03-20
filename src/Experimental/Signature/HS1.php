@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Experimental\Signature;
 
 use Jose\Component\Signature\Algorithm\HMAC;
 use Override;
-
 final readonly class HS1 extends HMAC
 {
     #[Override]
@@ -14,9 +12,8 @@ final readonly class HS1 extends HMAC
     {
         return 'HS1';
     }
-
     #[Override]
-    protected function getHashAlgorithm(): string
+    protected function get_hash_algorithm(): string
     {
         return 'sha1';
     }

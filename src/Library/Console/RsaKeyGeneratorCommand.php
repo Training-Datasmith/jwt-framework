@@ -1,39 +1,34 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Console;
 
 use InvalidArgumentException;
-use Jose\Component\KeyManagement\JWKFactory;
+use Jose\Component\Key_Management\Jwk_Factory;
 use Override;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
-#[AsCommand(name: 'key:generate:rsa', description: 'Generate a RSA key (JWK format)', )]
-final class RsaKeyGeneratorCommand extends GeneratorCommand
+use Symfony\Component\Console\Attribute\As_Command;
+use Symfony\Component\Console\Input\Input_Argument;
+use Symfony\Component\Console\Input\Input_Interface;
+use Symfony\Component\Console\Output\Output_Interface;
+#[As_Command(name: 'key:generate:rsa', description: 'Generate a RSA key (JWK format)')]
+final class Rsa_Key_Generator_Command extends Generator_Command
 {
     #[Override]
     protected function configure(): void
     {
         parent::configure();
-        $this->addArgument('size', InputArgument::REQUIRED, 'Key size.');
+        $this->add_argument('size', Input_Argument::REQUIRED, 'Key size.');
     }
-
     #[Override]
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(Input_Interface $input, Output_Interface $output): int
     {
-        $size = (int) $input->getArgument('size');
-        $args = $this->getOptions($input);
+        $size = (int) $input->get_argument('size');
+        $args = $this->get_options($input);
         if ($size < 1) {
             throw new InvalidArgumentException('Invalid size');
         }
-
-        $jwk = JWKFactory::createRSAKey($size, $args);
-        $this->prepareJsonOutput($input, $output, $jwk);
-
+        $jwk = Jwk_Factory::create_rsa_key($size, $args);
+        $this->prepare_json_output($input, $output, $jwk);
         return self::SUCCESS;
     }
 }

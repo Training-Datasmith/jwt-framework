@@ -1,45 +1,33 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Dependency_Injection\Compiler;
 
-namespace Jose\Bundle\JoseFramework\DependencyInjection\Compiler;
-
-use Jose\Bundle\JoseFramework\DataCollector\KeyCollector;
+use Jose\Bundle\Jose_Framework\Data_Collector\Key_Collector;
 use Override;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
-final readonly class KeyCollectorCompilerPass implements CompilerPassInterface
+use Symfony\Component\Dependency_Injection\Compiler\Compiler_Pass_Interface;
+use Symfony\Component\Dependency_Injection\Container_Builder;
+use Symfony\Component\Dependency_Injection\Definition;
+use Symfony\Component\Dependency_Injection\Reference;
+final readonly class Key_Collector_Compiler_Pass implements Compiler_Pass_Interface
 {
     #[Override]
-    public function process(ContainerBuilder $container): void
+    public function process(Container_Builder $container): void
     {
-        if (! $container->hasDefinition(KeyCollector::class)) {
+        if (!$container->has_definition(Key_Collector::class)) {
             return;
         }
-
-        $definition = $container->getDefinition(KeyCollector::class);
-
-        $services = [
-            'addJWK' => 'jose.jwk',
-            'addJWKSet' => 'jose.jwkset',
-        ];
+        $definition = $container->get_definition(Key_Collector::class);
+        $services = ['addJWK' => 'jose.jwk', 'addJWKSet' => 'jose.jwkset'];
         foreach ($services as $method => $tag) {
-            $this->collectServices($method, $tag, $definition, $container);
+            $this->collect_services($method, $tag, $definition, $container);
         }
     }
-
-    private function collectServices(
-        string $method,
-        string $tag,
-        Definition $definition,
-        ContainerBuilder $container
-    ): void {
-        $taggedJWSServices = $container->findTaggedServiceIds($tag);
-        foreach ($taggedJWSServices as $id => $tags) {
-            $definition->addMethodCall($method, [$id, new Reference($id)]);
+    private function collect_services(string $method, string $tag, Definition $definition, Container_Builder $container): void
+    {
+        $tagged_jws_services = $container->find_tagged_service_ids($tag);
+        foreach ($tagged_jws_services as $id => $tags) {
+            $definition->add_method_call($method, [$id, new Reference($id)]);
         }
     }
 }

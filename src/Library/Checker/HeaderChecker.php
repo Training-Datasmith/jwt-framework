@@ -1,26 +1,23 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Checker;
 
 /**
  * This interface defines the contract for a header checker.
  */
-interface HeaderChecker
+interface Header_Checker
 {
     /**
      * Checks if the given value matches the header parameter of the token.
      */
-    public function checkHeader(mixed $value): void;
-
+    public function check_header(mixed $value): void;
     /**
      * Retrieves the supported header for the token.
      */
-    public function supportedHeader(): string;
-
+    public function supported_header(): string;
     /**
      * Returns a boolean value indicating whether the requested resource can only be accessed with a protected header.
      */
-    public function protectedHeaderOnly(): bool;
+    public function protected_header_only(): bool;
 }

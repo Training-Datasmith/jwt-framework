@@ -1,115 +1,83 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Encryption\Serializer;
 
 use function array_key_exists;
 use function count;
-
 use InvalidArgumentException;
-
 use function is_array;
-
-use Jose\Component\Core\Util\Base64UrlSafe;
-use Jose\Component\Core\Util\JsonConverter;
+use Jose\Component\Core\Util\Base64url_Safe;
+use Jose\Component\Core\Util\Json_Converter;
 use Jose\Component\Encryption\JWE;
 use Jose\Component\Encryption\Recipient;
 use Override;
-
-final readonly class JSONFlattenedSerializer implements JWESerializer
+final readonly class Json_Flattened_Serializer implements Jwe_Serializer
 {
     public const NAME = 'jwe_json_flattened';
-
     #[Override]
-    public function displayName(): string
+    public function display_name(): string
     {
         return 'JWE JSON Flattened';
     }
-
     #[Override]
     public function name(): string
     {
         return self::NAME;
     }
-
     #[Override]
-    public function serialize(JWE $jwe, ?int $recipientIndex = null): string
+    public function serialize(JWE $jwe, ?int $recipient_index = null): string
     {
-        if ($recipientIndex === null) {
-            $recipientIndex = 0;
+        if ($recipient_index === null) {
+            $recipient_index = 0;
         }
-        $recipient = $jwe->getRecipient($recipientIndex);
-        $data = [
-            'ciphertext' => Base64UrlSafe::encodeUnpadded($jwe->getCiphertext() ?? ''),
-            'iv' => Base64UrlSafe::encodeUnpadded($jwe->getIV() ?? ''),
-            'tag' => Base64UrlSafe::encodeUnpadded($jwe->getTag() ?? ''),
-        ];
-        if ($jwe->getAAD() !== null) {
-            $data['aad'] = Base64UrlSafe::encodeUnpadded($jwe->getAAD());
+        $recipient = $jwe->get_recipient($recipient_index);
+        $data = ['ciphertext' => Base64url_Safe::encode_unpadded($jwe->get_ciphertext() ?? ''), 'iv' => Base64url_Safe::encode_unpadded($jwe->get_iv() ?? ''), 'tag' => Base64url_Safe::encode_unpadded($jwe->get_tag() ?? '')];
+        if ($jwe->get_aad() !== null) {
+            $data['aad'] = Base64url_Safe::encode_unpadded($jwe->get_aad());
         }
-        if (count($jwe->getSharedProtectedHeader()) !== 0) {
-            $data['protected'] = $jwe->getEncodedSharedProtectedHeader();
+        if (count($jwe->get_shared_protected_header()) !== 0) {
+            $data['protected'] = $jwe->get_encoded_shared_protected_header();
         }
-        if (count($jwe->getSharedHeader()) !== 0) {
-            $data['unprotected'] = $jwe->getSharedHeader();
+        if (count($jwe->get_shared_header()) !== 0) {
+            $data['unprotected'] = $jwe->get_shared_header();
         }
-        if (count($recipient->getHeader()) !== 0) {
-            $data['header'] = $recipient->getHeader();
+        if (count($recipient->get_header()) !== 0) {
+            $data['header'] = $recipient->get_header();
         }
-        if ($recipient->getEncryptedKey() !== null) {
-            $data['encrypted_key'] = Base64UrlSafe::encodeUnpadded($recipient->getEncryptedKey());
+        if ($recipient->get_encrypted_key() !== null) {
+            $data['encrypted_key'] = Base64url_Safe::encode_unpadded($recipient->get_encrypted_key());
         }
-
-        return JsonConverter::encode($data);
+        return Json_Converter::encode($data);
     }
-
     #[Override]
     public function unserialize(string $input): JWE
     {
-        $data = JsonConverter::decode($input);
-        if (! is_array($data)) {
+        $data = Json_Converter::decode($input);
+        if (!is_array($data)) {
             throw new InvalidArgumentException('Unsupported input.');
         }
-        $this->checkData($data);
-
-        $ciphertext = Base64UrlSafe::decodeNoPadding($data['ciphertext']);
-        $iv = Base64UrlSafe::decodeNoPadding($data['iv']);
-        $tag = Base64UrlSafe::decodeNoPadding($data['tag']);
-        $aad = array_key_exists('aad', $data) ? Base64UrlSafe::decodeNoPadding($data['aad']) : null;
-        [$encodedSharedProtectedHeader, $sharedProtectedHeader, $sharedHeader] = $this->processHeaders($data);
-        $encryptedKey = array_key_exists('encrypted_key', $data) ? Base64UrlSafe::decodeNoPadding(
-            $data['encrypted_key']
-        ) : null;
+        $this->check_data($data);
+        $ciphertext = Base64url_Safe::decode_no_padding($data['ciphertext']);
+        $iv = Base64url_Safe::decode_no_padding($data['iv']);
+        $tag = Base64url_Safe::decode_no_padding($data['tag']);
+        $aad = array_key_exists('aad', $data) ? Base64url_Safe::decode_no_padding($data['aad']) : null;
+        [$encoded_shared_protected_header, $shared_protected_header, $shared_header] = $this->process_headers($data);
+        $encrypted_key = array_key_exists('encrypted_key', $data) ? Base64url_Safe::decode_no_padding($data['encrypted_key']) : null;
         $header = array_key_exists('header', $data) ? $data['header'] : [];
-
-        return new JWE(
-            $ciphertext,
-            $iv,
-            $tag,
-            $aad,
-            $sharedHeader,
-            $sharedProtectedHeader,
-            $encodedSharedProtectedHeader,
-            [new Recipient($header, $encryptedKey)]
-        );
+        return new JWE($ciphertext, $iv, $tag, $aad, $shared_header, $shared_protected_header, $encoded_shared_protected_header, [new Recipient($header, $encrypted_key)]);
     }
-
-    private function checkData(?array $data): void
+    private function check_data(?array $data): void
     {
-        if ($data === null || ! isset($data['ciphertext']) || isset($data['recipients'])) {
+        if ($data === null || !isset($data['ciphertext']) || isset($data['recipients'])) {
             throw new InvalidArgumentException('Unsupported input.');
         }
     }
-
-    private function processHeaders(array $data): array
+    private function process_headers(array $data): array
     {
-        $encodedSharedProtectedHeader = array_key_exists('protected', $data) ? $data['protected'] : null;
-        $sharedProtectedHeader = $encodedSharedProtectedHeader ? JsonConverter::decode(
-            Base64UrlSafe::decodeNoPadding($encodedSharedProtectedHeader)
-        ) : [];
-        $sharedHeader = $data['unprotected'] ?? [];
-
-        return [$encodedSharedProtectedHeader, $sharedProtectedHeader, $sharedHeader];
+        $encoded_shared_protected_header = array_key_exists('protected', $data) ? $data['protected'] : null;
+        $shared_protected_header = $encoded_shared_protected_header ? Json_Converter::decode(Base64url_Safe::decode_no_padding($encoded_shared_protected_header)) : [];
+        $shared_header = $data['unprotected'] ?? [];
+        return [$encoded_shared_protected_header, $shared_protected_header, $shared_header];
     }
 }

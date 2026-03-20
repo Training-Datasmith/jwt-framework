@@ -1,47 +1,34 @@
 <?php
 
-declare(strict_types=1);
+declare (strict_types=1);
+namespace Jose\Bundle\Jose_Framework\Services;
 
-namespace Jose\Bundle\JoseFramework\Services;
-
-use Jose\Bundle\JoseFramework\Event\JWSLoadingFailureEvent;
-use Jose\Bundle\JoseFramework\Event\JWSLoadingSuccessEvent;
-use Jose\Component\Checker\HeaderCheckerManager;
-use Jose\Component\Core\JWKSet;
+use Jose\Bundle\Jose_Framework\Event\Jws_Loading_Failure_Event;
+use Jose\Bundle\Jose_Framework\Event\Jws_Loading_Success_Event;
+use Jose\Component\Checker\Header_Checker_Manager;
+use Jose\Component\Core\Jwk_Set;
 use Jose\Component\Signature\JWS;
-use Jose\Component\Signature\JWSLoader as BaseJWSLoader;
-use Jose\Component\Signature\JWSVerifier;
-use Jose\Component\Signature\Serializer\JWSSerializerManager;
+use Jose\Component\Signature\Jws_Loader as BaseJWSLoader;
+use Jose\Component\Signature\Jws_Verifier;
+use Jose\Component\Signature\Serializer\Jws_Serializer_Manager;
 use Override;
-use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Event_Dispatcher\Event_Dispatcher_Interface;
 use Throwable;
-
-final class JWSLoader extends BaseJWSLoader
+final class Jws_Loader extends Base_Jws_Loader
 {
-    public function __construct(
-        JWSSerializerManager $serializerManager,
-        JWSVerifier $jwsVerifier,
-        ?HeaderCheckerManager $headerCheckerManager,
-        private readonly EventDispatcherInterface $eventDispatcher
-    ) {
-        parent::__construct($serializerManager, $jwsVerifier, $headerCheckerManager);
+    public function __construct(Jws_Serializer_Manager $serializer_manager, Jws_Verifier $jws_verifier, ?Header_Checker_Manager $header_checker_manager, private readonly Event_Dispatcher_Interface $event_dispatcher)
+    {
+        parent::__construct($serializer_manager, $jws_verifier, $header_checker_manager);
     }
-
     #[Override]
-    public function loadAndVerifyWithKeySet(
-        string $token,
-        JWKSet $keyset,
-        ?int &$signature,
-        ?string $payload = null
-    ): JWS {
+    public function load_and_verify_with_key_set(string $token, Jwk_Set $keyset, ?int &$signature, ?string $payload = null): JWS
+    {
         try {
-            $jws = parent::loadAndVerifyWithKeySet($token, $keyset, $signature, $payload);
-            $this->eventDispatcher->dispatch(new JWSLoadingSuccessEvent($token, $jws, $keyset, $signature));
-
+            $jws = parent::load_and_verify_with_key_set($token, $keyset, $signature, $payload);
+            $this->event_dispatcher->dispatch(new Jws_Loading_Success_Event($token, $jws, $keyset, $signature));
             return $jws;
         } catch (Throwable $throwable) {
-            $this->eventDispatcher->dispatch(new JWSLoadingFailureEvent($token, $keyset, $throwable));
-
+            $this->event_dispatcher->dispatch(new Jws_Loading_Failure_Event($token, $keyset, $throwable));
             throw $throwable;
         }
     }

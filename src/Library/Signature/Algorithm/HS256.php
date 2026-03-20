@@ -1,15 +1,12 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Signature\Algorithm;
 
 use InvalidArgumentException;
 use Jose\Component\Core\JWK;
 use Override;
-
 use function strlen;
-
 final readonly class HS256 extends HMAC
 {
     #[Override]
@@ -17,21 +14,18 @@ final readonly class HS256 extends HMAC
     {
         return 'HS256';
     }
-
     #[Override]
-    protected function getHashAlgorithm(): string
+    protected function get_hash_algorithm(): string
     {
         return 'sha256';
     }
-
     #[Override]
-    protected function getKey(JWK $key): string
+    protected function get_key(JWK $key): string
     {
-        $k = parent::getKey($key);
+        $k = parent::get_key($key);
         if (strlen($k) < 32) {
             throw new InvalidArgumentException('Invalid key length.');
         }
-
         return $k;
     }
 }

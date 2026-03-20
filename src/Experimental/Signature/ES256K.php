@@ -1,12 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Experimental\Signature;
 
 use Jose\Component\Signature\Algorithm\ECDSA;
 use Override;
-
 final readonly class ES256K extends ECDSA
 {
     #[Override]
@@ -14,15 +12,13 @@ final readonly class ES256K extends ECDSA
     {
         return 'ES256K';
     }
-
     #[Override]
-    protected function getHashAlgorithm(): string
+    protected function get_hash_algorithm(): string
     {
         return 'sha256';
     }
-
     #[Override]
-    protected function getSignaturePartLength(): int
+    protected function get_signature_part_length(): int
     {
         return 64;
     }

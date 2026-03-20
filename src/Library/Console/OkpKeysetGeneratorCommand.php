@@ -1,54 +1,43 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Console;
 
 use InvalidArgumentException;
-
 use function is_string;
-
-use Jose\Component\Core\JWKSet;
-use Jose\Component\KeyManagement\JWKFactory;
+use Jose\Component\Core\Jwk_Set;
+use Jose\Component\Key_Management\Jwk_Factory;
 use Override;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-
-#[AsCommand(
-    name: 'keyset:generate:okp',
-    description: 'Generate a key set with Octet Key Pairs keys (JWKSet format)',
-)]
-final class OkpKeysetGeneratorCommand extends GeneratorCommand
+use Symfony\Component\Console\Attribute\As_Command;
+use Symfony\Component\Console\Input\Input_Argument;
+use Symfony\Component\Console\Input\Input_Interface;
+use Symfony\Component\Console\Output\Output_Interface;
+#[As_Command(name: 'keyset:generate:okp', description: 'Generate a key set with Octet Key Pairs keys (JWKSet format)')]
+final class Okp_Keyset_Generator_Command extends Generator_Command
 {
     #[Override]
     protected function configure(): void
     {
         parent::configure();
-        $this->addArgument('quantity', InputArgument::REQUIRED, 'Quantity of keys in the key set.')
-            ->addArgument('curve', InputArgument::REQUIRED, 'Curve of the keys.');
+        $this->add_argument('quantity', Input_Argument::REQUIRED, 'Quantity of keys in the key set.')->add_argument('curve', Input_Argument::REQUIRED, 'Curve of the keys.');
     }
-
     #[Override]
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(Input_Interface $input, Output_Interface $output): int
     {
-        $quantity = (int) $input->getArgument('quantity');
-        $curve = $input->getArgument('curve');
+        $quantity = (int) $input->get_argument('quantity');
+        $curve = $input->get_argument('curve');
         if ($quantity < 1) {
             throw new InvalidArgumentException('Invalid quantity');
         }
-        if (! is_string($curve)) {
+        if (!is_string($curve)) {
             throw new InvalidArgumentException('Invalid curve');
         }
-
-        $keyset = new JWKSet([]);
+        $keyset = new Jwk_Set([]);
         for ($i = 0; $i < $quantity; ++$i) {
-            $args = $this->getOptions($input);
-            $keyset = $keyset->with(JWKFactory::createOKPKey($curve, $args));
+            $args = $this->get_options($input);
+            $keyset = $keyset->with(Jwk_Factory::create_okp_key($curve, $args));
         }
-        $this->prepareJsonOutput($input, $output, $keyset);
-
+        $this->prepare_json_output($input, $output, $keyset);
         return self::SUCCESS;
     }
 }

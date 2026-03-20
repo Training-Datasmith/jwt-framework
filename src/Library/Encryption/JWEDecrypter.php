@@ -1,69 +1,58 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Encryption;
 
 use InvalidArgumentException;
-
 use function is_string;
-
 use Jose\Component\Core\Algorithm;
-use Jose\Component\Core\AlgorithmManager;
+use Jose\Component\Core\Algorithm_Manager;
 use Jose\Component\Core\JWK;
-use Jose\Component\Core\JWKSet;
-use Jose\Component\Core\Util\KeyChecker;
-use Jose\Component\Encryption\Algorithm\ContentEncryptionAlgorithm;
-use Jose\Component\Encryption\Algorithm\KeyEncryption\DirectEncryption;
-use Jose\Component\Encryption\Algorithm\KeyEncryption\KeyAgreement;
-use Jose\Component\Encryption\Algorithm\KeyEncryption\KeyAgreementWithKeyWrapping;
-use Jose\Component\Encryption\Algorithm\KeyEncryption\KeyEncryption;
-use Jose\Component\Encryption\Algorithm\KeyEncryption\KeyWrapping;
-use Jose\Component\Encryption\Algorithm\KeyEncryptionAlgorithm;
-
+use Jose\Component\Core\Jwk_Set;
+use Jose\Component\Core\Util\Key_Checker;
+use Jose\Component\Encryption\Algorithm\Content_Encryption_Algorithm;
+use Jose\Component\Encryption\Algorithm\Key_Encryption\Direct_Encryption;
+use Jose\Component\Encryption\Algorithm\Key_Encryption\Key_Agreement;
+use Jose\Component\Encryption\Algorithm\Key_Encryption\Key_Agreement_With_Key_Wrapping;
+use Jose\Component\Encryption\Algorithm\Key_Encryption\Key_Encryption;
+use Jose\Component\Encryption\Algorithm\Key_Encryption\Key_Wrapping;
+use Jose\Component\Encryption\Algorithm\Key_Encryption_Algorithm;
 use function sprintf;
 use function strlen;
-
 use Throwable;
-
-class JWEDecrypter
+class Jwe_Decrypter
 {
-    private readonly AlgorithmManager $keyEncryptionAlgorithmManager;
-
-    private readonly AlgorithmManager $contentEncryptionAlgorithmManager;
-
-    public function __construct(AlgorithmManager $algorithmManager)
+    private readonly Algorithm_Manager $key_encryption_algorithm_manager;
+    private readonly Algorithm_Manager $content_encryption_algorithm_manager;
+    public function __construct(Algorithm_Manager $algorithm_manager)
     {
-        $keyEncryptionAlgorithms = [];
-        $contentEncryptionAlgorithms = [];
-        foreach ($algorithmManager->all() as $key => $algorithm) {
-            if ($algorithm instanceof KeyEncryptionAlgorithm) {
-                $keyEncryptionAlgorithms[$key] = $algorithm;
+        $key_encryption_algorithms = [];
+        $content_encryption_algorithms = [];
+        foreach ($algorithm_manager->all() as $key => $algorithm) {
+            if ($algorithm instanceof Key_Encryption_Algorithm) {
+                $key_encryption_algorithms[$key] = $algorithm;
             }
-            if ($algorithm instanceof ContentEncryptionAlgorithm) {
-                $contentEncryptionAlgorithms[$key] = $algorithm;
+            if ($algorithm instanceof Content_Encryption_Algorithm) {
+                $content_encryption_algorithms[$key] = $algorithm;
             }
         }
-        $this->keyEncryptionAlgorithmManager = new AlgorithmManager($keyEncryptionAlgorithms);
-        $this->contentEncryptionAlgorithmManager = new AlgorithmManager($contentEncryptionAlgorithms);
+        $this->key_encryption_algorithm_manager = new Algorithm_Manager($key_encryption_algorithms);
+        $this->content_encryption_algorithm_manager = new Algorithm_Manager($content_encryption_algorithms);
     }
-
     /**
      * Returns the key encryption algorithm manager.
      */
-    public function getKeyEncryptionAlgorithmManager(): AlgorithmManager
+    public function get_key_encryption_algorithm_manager(): Algorithm_Manager
     {
-        return $this->keyEncryptionAlgorithmManager;
+        return $this->key_encryption_algorithm_manager;
     }
-
     /**
      * Returns the content encryption algorithm manager.
      */
-    public function getContentEncryptionAlgorithmManager(): AlgorithmManager
+    public function get_content_encryption_algorithm_manager(): Algorithm_Manager
     {
-        return $this->contentEncryptionAlgorithmManager;
+        return $this->content_encryption_algorithm_manager;
     }
-
     /**
      * This method will try to decrypt the given JWE and recipient using a JWK.
      *
@@ -71,13 +60,11 @@ class JWEDecrypter
      * @param JWK $jwk The key used to decrypt the input
      * @param int $recipient The recipient used to decrypt the token
      */
-    public function decryptUsingKey(JWE &$jwe, JWK $jwk, int $recipient, ?JWK $senderKey = null): bool
+    public function decrypt_using_key(JWE &$jwe, JWK $jwk, int $recipient, ?JWK $sender_key = null): bool
     {
-        $jwkset = new JWKSet([$jwk]);
-
-        return $this->decryptUsingKeySet($jwe, $jwkset, $recipient, $senderKey);
+        $jwkset = new Jwk_Set([$jwk]);
+        return $this->decrypt_using_key_set($jwe, $jwkset, $recipient, $sender_key);
     }
-
     /**
      * This method will try to decrypt the given JWE and recipient using a JWKSet.
      *
@@ -86,200 +73,115 @@ class JWEDecrypter
      * @param JWK $jwk The key used to decrypt the token in case of success
      * @param int $recipient The recipient used to decrypt the token in case of success
      */
-    public function decryptUsingKeySet(
-        JWE &$jwe,
-        JWKSet $jwkset,
-        int $recipient,
-        ?JWK &$jwk = null,
-        ?JWK $senderKey = null
-    ): bool {
+    public function decrypt_using_key_set(JWE &$jwe, Jwk_Set $jwkset, int $recipient, ?JWK &$jwk = null, ?JWK $sender_key = null): bool
+    {
         if ($jwkset->count() === 0) {
             throw new InvalidArgumentException('No key in the key set.');
         }
-        if ($jwe->getPayload() !== null) {
+        if ($jwe->get_payload() !== null) {
             return true;
         }
-        if ($jwe->countRecipients() === 0) {
+        if ($jwe->count_recipients() === 0) {
             throw new InvalidArgumentException('The JWE does not contain any recipient.');
         }
-
-        $plaintext = $this->decryptRecipientKey($jwe, $jwkset, $recipient, $jwk, $senderKey);
+        $plaintext = $this->decrypt_recipient_key($jwe, $jwkset, $recipient, $jwk, $sender_key);
         if ($plaintext !== null) {
-            $jwe = $jwe->withPayload($plaintext);
-
+            $jwe = $jwe->with_payload($plaintext);
             return true;
         }
-
         return false;
     }
-
-    private function decryptRecipientKey(
-        JWE $jwe,
-        JWKSet $jwkset,
-        int $i,
-        ?JWK &$successJwk = null,
-        ?JWK $senderKey = null
-    ): ?string {
-        $recipient = $jwe->getRecipient($i);
-        $completeHeader = array_merge(
-            $jwe->getSharedProtectedHeader(),
-            $jwe->getSharedHeader(),
-            $recipient->getHeader()
-        );
-        $this->checkCompleteHeader($completeHeader);
-
-        $key_encryption_algorithm = $this->getKeyEncryptionAlgorithm($completeHeader);
-        $content_encryption_algorithm = $this->getContentEncryptionAlgorithm($completeHeader);
-
-        $this->checkIvSize($jwe->getIV(), $content_encryption_algorithm->getIVSize());
-
-        foreach ($jwkset as $recipientKey) {
+    private function decrypt_recipient_key(JWE $jwe, Jwk_Set $jwkset, int $i, ?JWK &$success_jwk = null, ?JWK $sender_key = null): ?string
+    {
+        $recipient = $jwe->get_recipient($i);
+        $complete_header = array_merge($jwe->get_shared_protected_header(), $jwe->get_shared_header(), $recipient->get_header());
+        $this->check_complete_header($complete_header);
+        $key_encryption_algorithm = $this->get_key_encryption_algorithm($complete_header);
+        $content_encryption_algorithm = $this->get_content_encryption_algorithm($complete_header);
+        $this->check_iv_size($jwe->get_iv(), $content_encryption_algorithm->get_iv_size());
+        foreach ($jwkset as $recipient_key) {
             try {
-                KeyChecker::checkKeyUsage($recipientKey, 'decryption');
+                Key_Checker::check_key_usage($recipient_key, 'decryption');
                 if ($key_encryption_algorithm->name() !== 'dir') {
-                    KeyChecker::checkKeyAlgorithm($recipientKey, $key_encryption_algorithm->name());
+                    Key_Checker::check_key_algorithm($recipient_key, $key_encryption_algorithm->name());
                 } else {
-                    KeyChecker::checkKeyAlgorithm($recipientKey, $content_encryption_algorithm->name());
+                    Key_Checker::check_key_algorithm($recipient_key, $content_encryption_algorithm->name());
                 }
-                $cek = $this->decryptCEK(
-                    $key_encryption_algorithm,
-                    $content_encryption_algorithm,
-                    $recipientKey,
-                    $senderKey,
-                    $recipient,
-                    $completeHeader
-                );
-                $this->checkCekSize($cek, $key_encryption_algorithm, $content_encryption_algorithm);
-                $payload = $this->decryptPayload($jwe, $cek, $content_encryption_algorithm);
-                $successJwk = $recipientKey;
-
+                $cek = $this->decrypt_cek($key_encryption_algorithm, $content_encryption_algorithm, $recipient_key, $sender_key, $recipient, $complete_header);
+                $this->check_cek_size($cek, $key_encryption_algorithm, $content_encryption_algorithm);
+                $payload = $this->decrypt_payload($jwe, $cek, $content_encryption_algorithm);
+                $success_jwk = $recipient_key;
                 return $payload;
             } catch (Throwable) {
                 //We do nothing, we continue with other keys
                 continue;
             }
         }
-
         return null;
     }
-
-    private function checkCekSize(
-        string $cek,
-        KeyEncryptionAlgorithm $keyEncryptionAlgorithm,
-        ContentEncryptionAlgorithm $algorithm
-    ): void {
-        if ($keyEncryptionAlgorithm instanceof DirectEncryption || $keyEncryptionAlgorithm instanceof KeyAgreement) {
+    private function check_cek_size(string $cek, Key_Encryption_Algorithm $key_encryption_algorithm, Content_Encryption_Algorithm $algorithm): void
+    {
+        if ($key_encryption_algorithm instanceof Direct_Encryption || $key_encryption_algorithm instanceof Key_Agreement) {
             return;
         }
-        if (strlen($cek) * 8 !== $algorithm->getCEKSize()) {
+        if (strlen($cek) * 8 !== $algorithm->get_cek_size()) {
             throw new InvalidArgumentException('Invalid CEK size');
         }
     }
-
-    private function checkIvSize(?string $iv, int $requiredIvSize): void
+    private function check_iv_size(?string $iv, int $required_iv_size): void
     {
-        if ($iv === null && $requiredIvSize !== 0) {
+        if ($iv === null && $required_iv_size !== 0) {
             throw new InvalidArgumentException('Invalid IV size');
         }
-        if (is_string($iv) && strlen($iv) !== $requiredIvSize / 8) {
+        if (is_string($iv) && strlen($iv) !== $required_iv_size / 8) {
             throw new InvalidArgumentException('Invalid IV size');
         }
     }
-
-    private function decryptCEK(
-        Algorithm $key_encryption_algorithm,
-        ContentEncryptionAlgorithm $content_encryption_algorithm,
-        JWK $recipientKey,
-        ?JWK $senderKey,
-        Recipient $recipient,
-        array $completeHeader
-    ): string {
-        if ($key_encryption_algorithm instanceof DirectEncryption) {
-            return $key_encryption_algorithm->getCEK($recipientKey);
+    private function decrypt_cek(Algorithm $key_encryption_algorithm, Content_Encryption_Algorithm $content_encryption_algorithm, JWK $recipient_key, ?JWK $sender_key, Recipient $recipient, array $complete_header): string
+    {
+        if ($key_encryption_algorithm instanceof Direct_Encryption) {
+            return $key_encryption_algorithm->get_cek($recipient_key);
         }
-        if ($key_encryption_algorithm instanceof KeyAgreement) {
-            return $key_encryption_algorithm->getAgreementKey(
-                $content_encryption_algorithm->getCEKSize(),
-                $content_encryption_algorithm->name(),
-                $recipientKey,
-                $senderKey,
-                $completeHeader
-            );
+        if ($key_encryption_algorithm instanceof Key_Agreement) {
+            return $key_encryption_algorithm->get_agreement_key($content_encryption_algorithm->get_cek_size(), $content_encryption_algorithm->name(), $recipient_key, $sender_key, $complete_header);
         }
-        if ($key_encryption_algorithm instanceof KeyAgreementWithKeyWrapping) {
-            return $key_encryption_algorithm->unwrapAgreementKey(
-                $recipientKey,
-                $senderKey,
-                $recipient->getEncryptedKey() ?? '',
-                $content_encryption_algorithm->getCEKSize(),
-                $completeHeader
-            );
+        if ($key_encryption_algorithm instanceof Key_Agreement_With_Key_Wrapping) {
+            return $key_encryption_algorithm->unwrap_agreement_key($recipient_key, $sender_key, $recipient->get_encrypted_key() ?? '', $content_encryption_algorithm->get_cek_size(), $complete_header);
         }
-        if ($key_encryption_algorithm instanceof KeyEncryption) {
-            return $key_encryption_algorithm->decryptKey(
-                $recipientKey,
-                $recipient->getEncryptedKey() ?? '',
-                $completeHeader
-            );
+        if ($key_encryption_algorithm instanceof Key_Encryption) {
+            return $key_encryption_algorithm->decrypt_key($recipient_key, $recipient->get_encrypted_key() ?? '', $complete_header);
         }
-        if ($key_encryption_algorithm instanceof KeyWrapping) {
-            return $key_encryption_algorithm->unwrapKey(
-                $recipientKey,
-                $recipient->getEncryptedKey() ?? '',
-                $completeHeader
-            );
+        if ($key_encryption_algorithm instanceof Key_Wrapping) {
+            return $key_encryption_algorithm->unwrap_key($recipient_key, $recipient->get_encrypted_key() ?? '', $complete_header);
         }
-
         throw new InvalidArgumentException('Unsupported CEK generation');
     }
-
-    private function decryptPayload(
-        JWE $jwe,
-        string $cek,
-        ContentEncryptionAlgorithm $content_encryption_algorithm,
-    ): string {
-        return $content_encryption_algorithm->decryptContent(
-            $jwe->getCiphertext() ?? '',
-            $cek,
-            $jwe->getIV() ?? '',
-            $jwe->getAAD(),
-            $jwe->getEncodedSharedProtectedHeader(),
-            $jwe->getTag() ?? ''
-        );
+    private function decrypt_payload(JWE $jwe, string $cek, Content_Encryption_Algorithm $content_encryption_algorithm): string
+    {
+        return $content_encryption_algorithm->decrypt_content($jwe->get_ciphertext() ?? '', $cek, $jwe->get_iv() ?? '', $jwe->get_aad(), $jwe->get_encoded_shared_protected_header(), $jwe->get_tag() ?? '');
     }
-
-    private function checkCompleteHeader(array $completeHeaders): void
+    private function check_complete_header(array $complete_headers): void
     {
         foreach (['enc', 'alg'] as $key) {
-            if (! isset($completeHeaders[$key])) {
+            if (!isset($complete_headers[$key])) {
                 throw new InvalidArgumentException(sprintf("Parameter '%s' is missing.", $key));
             }
         }
     }
-
-    private function getKeyEncryptionAlgorithm(array $completeHeaders): KeyEncryptionAlgorithm
+    private function get_key_encryption_algorithm(array $complete_headers): Key_Encryption_Algorithm
     {
-        $key_encryption_algorithm = $this->keyEncryptionAlgorithmManager->get($completeHeaders['alg']);
-        if (! $key_encryption_algorithm instanceof KeyEncryptionAlgorithm) {
-            throw new InvalidArgumentException(sprintf(
-                'The key encryption algorithm "%s" is not supported or does not implement KeyEncryptionAlgorithm interface.',
-                $completeHeaders['alg']
-            ));
+        $key_encryption_algorithm = $this->key_encryption_algorithm_manager->get($complete_headers['alg']);
+        if (!$key_encryption_algorithm instanceof Key_Encryption_Algorithm) {
+            throw new InvalidArgumentException(sprintf('The key encryption algorithm "%s" is not supported or does not implement KeyEncryptionAlgorithm interface.', $complete_headers['alg']));
         }
-
         return $key_encryption_algorithm;
     }
-
-    private function getContentEncryptionAlgorithm(array $completeHeader): ContentEncryptionAlgorithm
+    private function get_content_encryption_algorithm(array $complete_header): Content_Encryption_Algorithm
     {
-        $content_encryption_algorithm = $this->contentEncryptionAlgorithmManager->get($completeHeader['enc']);
-        if (! $content_encryption_algorithm instanceof ContentEncryptionAlgorithm) {
-            throw new InvalidArgumentException(sprintf(
-                'The key encryption algorithm "%s" is not supported or does not implement the ContentEncryption interface.',
-                $completeHeader['enc']
-            ));
+        $content_encryption_algorithm = $this->content_encryption_algorithm_manager->get($complete_header['enc']);
+        if (!$content_encryption_algorithm instanceof Content_Encryption_Algorithm) {
+            throw new InvalidArgumentException(sprintf('The key encryption algorithm "%s" is not supported or does not implement the ContentEncryption interface.', $complete_header['enc']));
         }
-
         return $content_encryption_algorithm;
     }
 }

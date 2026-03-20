@@ -1,51 +1,42 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Jose\Component\Signature;
 
 use InvalidArgumentException;
 use Jose\Component\Core\Algorithm;
-use Jose\Component\Core\AlgorithmManager;
+use Jose\Component\Core\Algorithm_Manager;
 use Jose\Component\Core\JWK;
-use Jose\Component\Core\JWKSet;
-use Jose\Component\Core\Util\Base64UrlSafe;
-use Jose\Component\Core\Util\KeyChecker;
-use Jose\Component\Signature\Algorithm\MacAlgorithm;
-use Jose\Component\Signature\Algorithm\SignatureAlgorithm;
-
+use Jose\Component\Core\Jwk_Set;
+use Jose\Component\Core\Util\Base64url_Safe;
+use Jose\Component\Core\Util\Key_Checker;
+use Jose\Component\Signature\Algorithm\Mac_Algorithm;
+use Jose\Component\Signature\Algorithm\Signature_Algorithm;
 use function sprintf;
-
 use Throwable;
-
-class JWSVerifier
+class Jws_Verifier
 {
-    public function __construct(
-        private readonly AlgorithmManager $signatureAlgorithmManager
-    ) {
+    public function __construct(private readonly Algorithm_Manager $signature_algorithm_manager)
+    {
     }
-
     /**
      * Returns the algorithm manager associated to the JWSVerifier.
      */
-    public function getSignatureAlgorithmManager(): AlgorithmManager
+    public function get_signature_algorithm_manager(): Algorithm_Manager
     {
-        return $this->signatureAlgorithmManager;
+        return $this->signature_algorithm_manager;
     }
-
     /**
      * This method will try to verify the JWS object using the given key and for the given signature. It returns true if
      * the signature is verified, otherwise false.
      *
      * @return bool true if the verification of the signature succeeded, else false
      */
-    public function verifyWithKey(JWS $jws, JWK $jwk, int $signature, ?string $detachedPayload = null): bool
+    public function verify_with_key(JWS $jws, JWK $jwk, int $signature, ?string $detached_payload = null): bool
     {
-        $jwkset = new JWKSet([$jwk]);
-
-        return $this->verifyWithKeySet($jws, $jwkset, $signature, $detachedPayload);
+        $jwkset = new Jwk_Set([$jwk]);
+        return $this->verify_with_key_set($jws, $jwkset, $signature, $detached_payload);
     }
-
     /**
      * This method will try to verify the JWS object using the given key set and for the given signature. It returns
      * true if the signature is verified, otherwise false.
@@ -57,41 +48,28 @@ class JWSVerifier
      *
      * @return bool true if the verification of the signature succeeded, else false
      */
-    public function verifyWithKeySet(
-        JWS $jws,
-        JWKSet $jwkset,
-        int $signatureIndex,
-        ?string $detachedPayload = null,
-        ?JWK &$jwk = null
-    ): bool {
+    public function verify_with_key_set(JWS $jws, Jwk_Set $jwkset, int $signature_index, ?string $detached_payload = null, ?JWK &$jwk = null): bool
+    {
         if ($jwkset->count() === 0) {
             throw new InvalidArgumentException('There is no key in the key set.');
         }
-        if ($jws->countSignatures() === 0) {
+        if ($jws->count_signatures() === 0) {
             throw new InvalidArgumentException('The JWS does not contain any signature.');
         }
-        $this->checkPayload($jws, $detachedPayload);
-        $signature = $jws->getSignature($signatureIndex);
-
-        return $this->verifySignature($jws, $jwkset, $signature, $detachedPayload, $jwk);
+        $this->check_payload($jws, $detached_payload);
+        $signature = $jws->get_signature($signature_index);
+        return $this->verify_signature($jws, $jwkset, $signature, $detached_payload, $jwk);
     }
-
-    private function verifySignature(
-        JWS $jws,
-        JWKSet $jwkset,
-        Signature $signature,
-        ?string $detachedPayload = null,
-        ?JWK &$successJwk = null
-    ): bool {
-        $input = $this->getInputToVerify($jws, $signature, $detachedPayload);
-        $algorithm = $this->getAlgorithm($signature);
+    private function verify_signature(JWS $jws, Jwk_Set $jwkset, Signature $signature, ?string $detached_payload = null, ?JWK &$success_jwk = null): bool
+    {
+        $input = $this->get_input_to_verify($jws, $signature, $detached_payload);
+        $algorithm = $this->get_algorithm($signature);
         foreach ($jwkset->all() as $jwk) {
             try {
-                KeyChecker::checkKeyUsage($jwk, 'verification');
-                KeyChecker::checkKeyAlgorithm($jwk, $algorithm->name());
-                if ($algorithm->verify($jwk, $input, $signature->getSignature()) === true) {
-                    $successJwk = $jwk;
-
+                Key_Checker::check_key_usage($jwk, 'verification');
+                Key_Checker::check_key_algorithm($jwk, $algorithm->name());
+                if ($algorithm->verify($jwk, $input, $signature->get_signature()) === true) {
+                    $success_jwk = $jwk;
                     return true;
                 }
             } catch (Throwable) {
@@ -99,67 +77,48 @@ class JWSVerifier
                 continue;
             }
         }
-
         return false;
     }
-
-    private function getInputToVerify(JWS $jws, Signature $signature, ?string $detachedPayload): string
+    private function get_input_to_verify(JWS $jws, Signature $signature, ?string $detached_payload): string
     {
-        $payload = $jws->getPayload();
-        $isPayloadEmpty = $payload === null || $payload === '';
-        $encodedProtectedHeader = $signature->getEncodedProtectedHeader() ?? '';
-        $isPayloadBase64Encoded = ! $signature->hasProtectedHeaderParameter(
-            'b64'
-        ) || $signature->getProtectedHeaderParameter('b64') === true;
-        $encodedPayload = $jws->getEncodedPayload();
-
-        if ($isPayloadBase64Encoded && $encodedPayload !== null) {
-            return sprintf('%s.%s', $encodedProtectedHeader, $encodedPayload);
+        $payload = $jws->get_payload();
+        $is_payload_empty = $payload === null || $payload === '';
+        $encoded_protected_header = $signature->get_encoded_protected_header() ?? '';
+        $is_payload_base64encoded = !$signature->has_protected_header_parameter('b64') || $signature->get_protected_header_parameter('b64') === true;
+        $encoded_payload = $jws->get_encoded_payload();
+        if ($is_payload_base64encoded && $encoded_payload !== null) {
+            return sprintf('%s.%s', $encoded_protected_header, $encoded_payload);
         }
-
-        $callable = $isPayloadBase64Encoded === true ? static fn (?string $p): string => Base64UrlSafe::encodeUnpadded(
-            $p ?? ''
-        )
-            : static fn (?string $p): string => $p ?? '';
-
-        $payloadToUse = $callable($isPayloadEmpty ? $detachedPayload : $payload);
-
-        return sprintf('%s.%s', $encodedProtectedHeader, $payloadToUse);
+        $callable = $is_payload_base64encoded === true ? static fn(?string $p): string => Base64url_Safe::encode_unpadded($p ?? '') : static fn(?string $p): string => $p ?? '';
+        $payload_to_use = $callable($is_payload_empty ? $detached_payload : $payload);
+        return sprintf('%s.%s', $encoded_protected_header, $payload_to_use);
     }
-
-    private function checkPayload(JWS $jws, ?string $detachedPayload = null): void
+    private function check_payload(JWS $jws, ?string $detached_payload = null): void
     {
-        $isPayloadEmpty = $this->isPayloadEmpty($jws->getPayload());
-        if ($detachedPayload !== null && ! $isPayloadEmpty) {
+        $is_payload_empty = $this->is_payload_empty($jws->get_payload());
+        if ($detached_payload !== null && !$is_payload_empty) {
             throw new InvalidArgumentException('A detached payload is set, but the JWS already has a payload.');
         }
-        if ($isPayloadEmpty && $detachedPayload === null) {
+        if ($is_payload_empty && $detached_payload === null) {
             throw new InvalidArgumentException('The JWS has a detached payload, but no payload is provided.');
         }
     }
-
     /**
      * @return MacAlgorithm|SignatureAlgorithm
      */
-    private function getAlgorithm(Signature $signature): Algorithm
+    private function get_algorithm(Signature $signature): Algorithm
     {
-        $completeHeader = [...$signature->getProtectedHeader(), ...$signature->getHeader()];
-        if (! isset($completeHeader['alg'])) {
+        $complete_header = [...$signature->get_protected_header(), ...$signature->get_header()];
+        if (!isset($complete_header['alg'])) {
             throw new InvalidArgumentException('No "alg" parameter set in the header.');
         }
-
-        $algorithm = $this->signatureAlgorithmManager->get($completeHeader['alg']);
-        if (! $algorithm instanceof SignatureAlgorithm && ! $algorithm instanceof MacAlgorithm) {
-            throw new InvalidArgumentException(sprintf(
-                'The algorithm "%s" is not supported or is not a signature or MAC algorithm.',
-                $completeHeader['alg']
-            ));
+        $algorithm = $this->signature_algorithm_manager->get($complete_header['alg']);
+        if (!$algorithm instanceof Signature_Algorithm && !$algorithm instanceof Mac_Algorithm) {
+            throw new InvalidArgumentException(sprintf('The algorithm "%s" is not supported or is not a signature or MAC algorithm.', $complete_header['alg']));
         }
-
         return $algorithm;
     }
-
-    private function isPayloadEmpty(?string $payload): bool
+    private function is_payload_empty(?string $payload): bool
     {
         return $payload === null || $payload === '';
     }

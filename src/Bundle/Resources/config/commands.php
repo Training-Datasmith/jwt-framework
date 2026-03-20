@@ -1,60 +1,53 @@
 <?php
 
-declare(strict_types=1);
-
-use Jose\Component\Console\AddKeyIntoKeysetCommand;
-use Jose\Component\Console\EcKeyGeneratorCommand;
-use Jose\Component\Console\EcKeysetGeneratorCommand;
-use Jose\Component\Console\GetThumbprintCommand;
-use Jose\Component\Console\KeyAnalyzerCommand;
-use Jose\Component\Console\KeyFileLoaderCommand;
-use Jose\Component\Console\KeysetAnalyzerCommand;
-use Jose\Component\Console\MergeKeysetCommand;
-use Jose\Component\Console\NoneKeyGeneratorCommand;
-use Jose\Component\Console\OctKeyGeneratorCommand;
-use Jose\Component\Console\OctKeysetGeneratorCommand;
-use Jose\Component\Console\OkpKeyGeneratorCommand;
-use Jose\Component\Console\OkpKeysetGeneratorCommand;
-use Jose\Component\Console\OptimizeRsaKeyCommand;
-use Jose\Component\Console\P12CertificateLoaderCommand;
-use Jose\Component\Console\PemConverterCommand;
-use Jose\Component\Console\PublicKeyCommand;
-use Jose\Component\Console\PublicKeysetCommand;
-use Jose\Component\Console\RotateKeysetCommand;
-use Jose\Component\Console\RsaKeyGeneratorCommand;
-use Jose\Component\Console\RsaKeysetGeneratorCommand;
-use Jose\Component\Console\SecretKeyGeneratorCommand;
-use Jose\Component\Console\X509CertificateLoaderCommand;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-
-return function (ContainerConfigurator $container): void {
-    $container = $container->services()
-        ->defaults()
-        ->private()
-        ->autoconfigure()
-        ->autowire();
-
-    $container->set(AddKeyIntoKeysetCommand::class);
-    $container->set(EcKeyGeneratorCommand::class);
-    $container->set(EcKeysetGeneratorCommand::class);
-    $container->set(GetThumbprintCommand::class);
-    $container->set(OptimizeRsaKeyCommand::class);
-    $container->set(KeyAnalyzerCommand::class);
-    $container->set(KeyFileLoaderCommand::class);
-    $container->set(KeysetAnalyzerCommand::class);
-    $container->set(MergeKeysetCommand::class);
-    $container->set(NoneKeyGeneratorCommand::class);
-    $container->set(OctKeyGeneratorCommand::class);
-    $container->set(OctKeysetGeneratorCommand::class);
-    $container->set(OkpKeyGeneratorCommand::class);
-    $container->set(OkpKeysetGeneratorCommand::class);
-    $container->set(P12CertificateLoaderCommand::class);
-    $container->set(PemConverterCommand::class);
-    $container->set(PublicKeyCommand::class);
-    $container->set(PublicKeysetCommand::class);
-    $container->set(RotateKeysetCommand::class);
-    $container->set(RsaKeyGeneratorCommand::class);
-    $container->set(RsaKeysetGeneratorCommand::class);
-    $container->set(SecretKeyGeneratorCommand::class);
-    $container->set(X509CertificateLoaderCommand::class);
+declare (strict_types=1);
+use Jose\Component\Console\Add_Key_Into_Keyset_Command;
+use Jose\Component\Console\Ec_Key_Generator_Command;
+use Jose\Component\Console\Ec_Keyset_Generator_Command;
+use Jose\Component\Console\Get_Thumbprint_Command;
+use Jose\Component\Console\Key_Analyzer_Command;
+use Jose\Component\Console\Key_File_Loader_Command;
+use Jose\Component\Console\Keyset_Analyzer_Command;
+use Jose\Component\Console\Merge_Keyset_Command;
+use Jose\Component\Console\None_Key_Generator_Command;
+use Jose\Component\Console\Oct_Key_Generator_Command;
+use Jose\Component\Console\Oct_Keyset_Generator_Command;
+use Jose\Component\Console\Okp_Key_Generator_Command;
+use Jose\Component\Console\Okp_Keyset_Generator_Command;
+use Jose\Component\Console\Optimize_Rsa_Key_Command;
+use Jose\Component\Console\P12certificate_Loader_Command;
+use Jose\Component\Console\Pem_Converter_Command;
+use Jose\Component\Console\Public_Key_Command;
+use Jose\Component\Console\Public_Keyset_Command;
+use Jose\Component\Console\Rotate_Keyset_Command;
+use Jose\Component\Console\Rsa_Key_Generator_Command;
+use Jose\Component\Console\Rsa_Keyset_Generator_Command;
+use Jose\Component\Console\Secret_Key_Generator_Command;
+use Jose\Component\Console\X509certificate_Loader_Command;
+use Symfony\Component\Dependency_Injection\Loader\Configurator\Container_Configurator;
+return function (Container_Configurator $container): void {
+    $container = $container->services()->defaults()->private()->autoconfigure()->autowire();
+    $container->set(Add_Key_Into_Keyset_Command::class);
+    $container->set(Ec_Key_Generator_Command::class);
+    $container->set(Ec_Keyset_Generator_Command::class);
+    $container->set(Get_Thumbprint_Command::class);
+    $container->set(Optimize_Rsa_Key_Command::class);
+    $container->set(Key_Analyzer_Command::class);
+    $container->set(Key_File_Loader_Command::class);
+    $container->set(Keyset_Analyzer_Command::class);
+    $container->set(Merge_Keyset_Command::class);
+    $container->set(None_Key_Generator_Command::class);
+    $container->set(Oct_Key_Generator_Command::class);
+    $container->set(Oct_Keyset_Generator_Command::class);
+    $container->set(Okp_Key_Generator_Command::class);
+    $container->set(Okp_Keyset_Generator_Command::class);
+    $container->set(P12certificate_Loader_Command::class);
+    $container->set(Pem_Converter_Command::class);
+    $container->set(Public_Key_Command::class);
+    $container->set(Public_Keyset_Command::class);
+    $container->set(Rotate_Keyset_Command::class);
+    $container->set(Rsa_Key_Generator_Command::class);
+    $container->set(Rsa_Keyset_Generator_Command::class);
+    $container->set(Secret_Key_Generator_Command::class);
+    $container->set(X509certificate_Loader_Command::class);
 };
