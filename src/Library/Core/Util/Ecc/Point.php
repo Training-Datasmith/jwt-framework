@@ -70,26 +70,39 @@ final readonly class Point
         return $this->y;
     }
 
-    public static function cswap(self $a, self $b, int $cond): void
+    /**
+     * @return array{self, self}
+     */
+    public static function cswap(self $a, self $b, int $cond): array
     {
-        self::cswapBigInteger($a->x, $b->x, $cond);
-        self::cswapBigInteger($a->y, $b->y, $cond);
-        self::cswapBigInteger($a->order, $b->order, $cond);
-        self::cswapBoolean($a->infinity, $b->infinity, $cond);
+        [$xA, $xB] = self::cswapBigInteger($a->x, $b->x, $cond);
+        [$yA, $yB] = self::cswapBigInteger($a->y, $b->y, $cond);
+        [$orderA, $orderB] = self::cswapBigInteger($a->order, $b->order, $cond);
+        [$infinityA, $infinityB] = self::cswapBoolean($a->infinity, $b->infinity, $cond);
+
+        return [
+            new self($xA, $yA, $orderA, $infinityA),
+            new self($xB, $yB, $orderB, $infinityB),
+        ];
     }
 
-    private static function cswapBoolean(bool &$a, bool &$b, int $cond): void
+    /**
+     * @return array{bool, bool}
+     */
+    private static function cswapBoolean(bool $a, bool $b, int $cond): array
     {
         $sa = BigInteger::of((int) $a);
         $sb = BigInteger::of((int) $b);
 
-        self::cswapBigInteger($sa, $sb, $cond);
+        [$sa, $sb] = self::cswapBigInteger($sa, $sb, $cond);
 
-        $a = (bool) $sa->toBase(10);
-        $b = (bool) $sb->toBase(10);
+        return [(bool) $sa->toBase(10), (bool) $sb->toBase(10)];
     }
 
-    private static function cswapBigInteger(BigInteger &$sa, BigInteger &$sb, int $cond): void
+    /**
+     * @return array{BigInteger, BigInteger}
+     */
+    private static function cswapBigInteger(BigInteger $sa, BigInteger $sb, int $cond): array
     {
         $size = max(strlen($sa->toBase(2)), strlen($sb->toBase(2)));
         $mask = (string) (1 - $cond);
@@ -103,5 +116,7 @@ final readonly class Point
             ->xor($taA);
         $sa = $sa->xor($sb)
             ->xor($taB);
+
+        return [$sa, $sb];
     }
 }

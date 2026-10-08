@@ -70,8 +70,9 @@ class JWEDecrypter
     public function decryptUsingKey(JWE &$jwe, JWK $jwk, int $recipient, ?JWK $senderKey = null): bool
     {
         $jwkset = new JWKSet([$jwk]);
+        $successJwk = null;
 
-        return $this->decryptUsingKeySet($jwe, $jwkset, $recipient, $senderKey);
+        return $this->decryptUsingKeySet($jwe, $jwkset, $recipient, $successJwk, $senderKey);
     }
 
     /**

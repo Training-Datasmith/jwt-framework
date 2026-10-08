@@ -73,7 +73,7 @@ final class RSAPSSSignatureTest extends TestCase
             ->addSignature($privateKey, $header)
             ->build();
 
-        $jwsVerifier->verifyWithKey($jws, $privateKey, 0);
+        static::assertTrue($jwsVerifier->verifyWithKey($jws, $privateKey, 0));
 
         /**
          * Header.

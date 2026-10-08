@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Jose\Tests\EncryptionAlgorithm\Experimental;
 
 use Jose\Component\Core\JWK;
+use Jose\Component\Core\Util\Base64UrlSafe;
 use Jose\Experimental\KeyEncryption\Chacha20Poly1305;
 use Override;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Throwable;
 use function in_array;
-use function sprintf;
+use function strlen;
 
 /**
  * @internal
@@ -35,17 +35,13 @@ final class Chacha20Poly1305ContentEncryptionTest extends TestCase
         $jwk = $this->getKey();
 
         $additionalHeader = [];
-        try {
-            $encrypted = $algorithm->encryptKey($jwk, $cek, $header, $additionalHeader);
-            $decrypted = $algorithm->decryptKey($jwk, $encrypted, $additionalHeader);
+        $encrypted = $algorithm->encryptKey($jwk, $cek, $header, $additionalHeader);
+        static::assertArrayHasKey('tag', $additionalHeader);
+        static::assertSame(16, strlen(Base64UrlSafe::decodeNoPadding($additionalHeader['tag'])));
 
-            static::assertSame($cek, $decrypted);
-        } catch (Throwable $e) {
-            static::markTestSkipped(sprintf(
-                'The algorithm "chacha20-poly1305" is not supported in this platform. Error message: %s',
-                $e->getMessage()
-            ));
-        }
+        $decrypted = $algorithm->decryptKey($jwk, $encrypted, $additionalHeader);
+
+        static::assertSame($cek, $decrypted);
     }
 
     private function getKey(): JWK
