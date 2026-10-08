@@ -17,6 +17,21 @@ use PHPUnit\Framework\TestCase;
 final class EccScalarMultiplicationTest extends TestCase
 {
     #[Test]
+    public function scalarMultiplicationYieldsPublishedP256GeneratorDouble(): void
+    {
+        $curve = NistCurve::curve256();
+        $generator = $curve->getGenerator();
+        $twoG = $curve->mul($generator, BigInteger::of(2));
+
+        $expectedX = BigInteger::fromBase('7cf27b188d034f7e8a52380304b51ac3c08969e277f21b35a60b48fc47669978', 16);
+        $expectedY = BigInteger::fromBase('07775510db8ed040293d9ac69f7430dbba7dade63ce982299e04b79d227873d1', 16);
+
+        static::assertTrue($twoG->getX()->isEqualTo($expectedX));
+        static::assertTrue($twoG->getY()->isEqualTo($expectedY));
+        static::assertFalse($twoG->isInfinity());
+    }
+
+    #[Test]
     public function scalarMultiplicationMatchesDoubleAndAddOnP256(): void
     {
         $curve = NistCurve::curve256();
