@@ -9,7 +9,7 @@ use Jose\Component\Encryption\JWE;
 use Jose\Component\Encryption\Serializer\CompactSerializer;
 
 /**
- * Fixed P-256 receiver and sender keys and a single ECDH-SS+A128KW / A128GCM compact JWE.
+ * Fixed P-256 sender/receiver keys and a builder-emitted ECDH-SS+A128KW / A128GCM compact JWE (no epk).
  *
  * @internal
  */
@@ -39,19 +39,28 @@ final class EcdhSsA128KwJweFixture
         'y' => 'H-botOhHNdg_EMnxni5XWS96t3-WcT-bBgkaXy4ikkI',
     ];
 
-    private const COMPACT_TOKEN = 'eyJhbGciOiJFQ0RILVNTK0ExMjhLVyIsImVuYyI6IkExMjhHQ00iLCJlcGsiOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiI2MUxvRGNpVl91OTZFN2kwMjZfV1J0WUlGQkthZVJXS3JNMWZ5a2JEZzBBIiwieSI6IkgtYm90T2hITmRnX0VNbnhuaTVYV1M5NnQzLVdjVC1iQmdrYVh5NGlra0kifX0.Nrs5vR3B7mMx2qSpuYWXn0cfgDcOtYoO.mk4qLF0HaITChilW.Xlj5eRBVdTf0216al9D-8nicDX_o7OOAhxdREv3T.yGzZI0eL1yY4FeA5P6i0Mw';
+    private const COMPACT_TOKEN = 'eyJhbGciOiJFQ0RILVNTK0ExMjhLVyIsImVuYyI6IkExMjhHQ00ifQ.iImlCBts9V0K7Y2B3XcNDPnZbTsxZwSh.EsyFiyaPxDIjHLgQ.0Xt_1MbW7H5_ZQJ7yAtNYFPS6LS9-iVcuIGtkUAp.Sm_aIgopB9z-6VPkvsMZ2w';
 
     /**
-     * @return array{jwe: JWE, receiverKey: JWK, senderKey: JWK, payload: string}
+     * @return array{
+     *     jwe: JWE,
+     *     receiverKey: JWK,
+     *     senderKey: JWK,
+     *     senderPublic: JWK,
+     *     payload: string
+     * }
      */
     public static function createEncryptedJwe(): array
     {
+        $receiverKey = new JWK(self::RECEIVER_KEY_PARAMETERS);
+        $senderKey = new JWK(self::SENDER_KEY_PARAMETERS);
         $jwe = (new CompactSerializer())->unserialize(self::COMPACT_TOKEN);
 
         return [
             'jwe' => $jwe,
-            'receiverKey' => new JWK(self::RECEIVER_KEY_PARAMETERS),
-            'senderKey' => new JWK(self::SENDER_KEY_PARAMETERS),
+            'receiverKey' => $receiverKey,
+            'senderKey' => $senderKey,
+            'senderPublic' => $senderKey->toPublic(),
             'payload' => self::PAYLOAD,
         ];
     }

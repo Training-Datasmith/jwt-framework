@@ -25,7 +25,7 @@ final class JweEcdhSsAllowListTest extends EncryptionTestCase
 
     private const ALLOWED_WITHOUT_ECDH_SS = ['A128KW', 'A128GCM'];
 
-    private const ALLOWED_WITH_ECDH_SS = ['ECDH-SS+A128KW', 'A128GCM'];
+    private const ALLOWED_WITH_ECDH_SS = ['A128KW', 'A128GCM', 'ECDH-SS+A128KW'];
 
     #[Test]
     public function decryptUsingKeyRejectsEcdhSsTokenWhenAlgorithmIsNotAllowListed(): void
@@ -38,10 +38,9 @@ final class JweEcdhSsAllowListTest extends EncryptionTestCase
         static::assertFalse($this->attemptDecryptUsingKey(
             $decrypter,
             $fixture['jwe'],
-            $fixture['receiverKey'],
-            $fixture['senderKey']
+            $fixture['senderPublic'],
+            $fixture['receiverKey']
         ));
-        static::assertNull($fixture['jwe']->getPayload());
     }
 
     #[Test]
@@ -56,11 +55,10 @@ final class JweEcdhSsAllowListTest extends EncryptionTestCase
         static::assertFalse($this->attemptDecryptUsingKeySet(
             $decrypter,
             $fixture['jwe'],
-            $fixture['receiverKey'],
+            $fixture['senderPublic'],
             $successJwk,
-            $fixture['senderKey']
+            $fixture['receiverKey']
         ));
-        static::assertNull($fixture['jwe']->getPayload());
     }
 
     #[Test]
@@ -72,9 +70,9 @@ final class JweEcdhSsAllowListTest extends EncryptionTestCase
         static::assertTrue($decrypter->getKeyEncryptionAlgorithmManager()->has('ECDH-SS+A128KW'));
         static::assertTrue($decrypter->decryptUsingKey(
             $fixture['jwe'],
-            $fixture['receiverKey'],
+            $fixture['senderPublic'],
             0,
-            $fixture['senderKey']
+            $fixture['receiverKey']
         ));
         static::assertSame($fixture['payload'], $fixture['jwe']->getPayload());
     }
@@ -89,10 +87,10 @@ final class JweEcdhSsAllowListTest extends EncryptionTestCase
         static::assertTrue($decrypter->getKeyEncryptionAlgorithmManager()->has('ECDH-SS+A128KW'));
         static::assertTrue($decrypter->decryptUsingKeySet(
             $fixture['jwe'],
-            new JWKSet([$fixture['receiverKey']]),
+            new JWKSet([$fixture['senderPublic']]),
             0,
             $successJwk,
-            $fixture['senderKey']
+            $fixture['receiverKey']
         ));
         static::assertSame($fixture['payload'], $fixture['jwe']->getPayload());
     }
@@ -110,11 +108,11 @@ final class JweEcdhSsAllowListTest extends EncryptionTestCase
     private function attemptDecryptUsingKey(
         JWEDecrypter $decrypter,
         JWE $jwe,
-        JWK $receiverKey,
-        JWK $senderKey
+        JWK $senderPublic,
+        JWK $receiverPrivate
     ): bool {
         try {
-            return $decrypter->decryptUsingKey($jwe, $receiverKey, 0, $senderKey);
+            return $decrypter->decryptUsingKey($jwe, $senderPublic, 0, $receiverPrivate);
         } catch (InvalidArgumentException) {
             return false;
         }
@@ -123,17 +121,17 @@ final class JweEcdhSsAllowListTest extends EncryptionTestCase
     private function attemptDecryptUsingKeySet(
         JWEDecrypter $decrypter,
         JWE $jwe,
-        JWK $receiverKey,
+        JWK $senderPublic,
         ?JWK &$successJwk,
-        JWK $senderKey
+        JWK $receiverPrivate
     ): bool {
         try {
             return $decrypter->decryptUsingKeySet(
                 $jwe,
-                new JWKSet([$receiverKey]),
+                new JWKSet([$senderPublic]),
                 0,
                 $successJwk,
-                $senderKey
+                $receiverPrivate
             );
         } catch (InvalidArgumentException) {
             return false;

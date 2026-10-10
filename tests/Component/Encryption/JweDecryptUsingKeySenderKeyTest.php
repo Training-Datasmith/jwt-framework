@@ -30,13 +30,12 @@ final class JweDecryptUsingKeySenderKeyTest extends EncryptionTestCase
             ->withSharedProtectedHeader([
                 'alg' => 'ECDH-SS+A128KW',
                 'enc' => 'A128GCM',
-                'epk' => $senderKey->toPublic()->all(),
             ])
             ->addRecipient($receiverKey->toPublic())
             ->withSenderKey($senderKey)
             ->build();
 
-        static::assertTrue($jweDecrypter->decryptUsingKey($jwe, $receiverKey, 0, $senderKey));
+        static::assertTrue($jweDecrypter->decryptUsingKey($jwe, $senderKey->toPublic(), 0, $receiverKey));
         static::assertSame($payload, $jwe->getPayload());
     }
 }
