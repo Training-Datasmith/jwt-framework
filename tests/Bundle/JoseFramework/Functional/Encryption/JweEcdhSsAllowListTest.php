@@ -6,11 +6,9 @@ namespace Jose\Tests\Bundle\JoseFramework\Functional\Encryption;
 
 use InvalidArgumentException;
 use Jose\Bundle\JoseFramework\Services\JWEDecrypterFactory as BundleJWEDecrypterFactory;
-use Jose\Component\Core\AlgorithmManagerFactory;
 use Jose\Component\Core\JWK;
 use Jose\Component\Core\JWKSet;
 use Jose\Component\Encryption\JWE;
-use Jose\Component\Encryption\JWEBuilderFactory;
 use Jose\Component\Encryption\JWEDecrypter;
 use Jose\Tests\Bundle\JoseFramework\WebTestCase;
 use Jose\Tests\Component\Encryption\EcdhSsA128KwJweFixture;
@@ -28,12 +26,7 @@ final class JweEcdhSsAllowListTest extends WebTestCase
         $client = static::createClient();
         $container = $client->getContainer();
 
-        $algorithmManagerFactory = $container->get(AlgorithmManagerFactory::class);
-        static::assertInstanceOf(AlgorithmManagerFactory::class, $algorithmManagerFactory);
-
-        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe(
-            new JWEBuilderFactory($algorithmManagerFactory)
-        );
+        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe();
 
         $decrypterFactory = $container->get(BundleJWEDecrypterFactory::class);
         static::assertInstanceOf(BundleJWEDecrypterFactory::class, $decrypterFactory);
@@ -58,16 +51,48 @@ final class JweEcdhSsAllowListTest extends WebTestCase
     }
 
     #[Test]
+    public static function bundleDecrypterFactoryAcceptsEcdhSsTokenWithAllowListedAlgorithms(): void
+    {
+        static::ensureKernelShutdown();
+        $client = static::createClient();
+        $container = $client->getContainer();
+
+        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe();
+
+        $decrypterFactory = $container->get(BundleJWEDecrypterFactory::class);
+        static::assertInstanceOf(BundleJWEDecrypterFactory::class, $decrypterFactory);
+
+        $decrypter = $decrypterFactory->create(['ECDH-SS+A128KW', 'A128GCM']);
+        static::assertTrue($decrypter->getKeyEncryptionAlgorithmManager()->has('ECDH-SS+A128KW'));
+
+        static::assertTrue($decrypter->decryptUsingKey(
+            $fixture['jwe'],
+            $fixture['receiverKey'],
+            0,
+            $fixture['senderKey']
+        ));
+        static::assertSame($fixture['payload'], $fixture['jwe']->getPayload());
+
+        $keySetFixture = EcdhSsA128KwJweFixture::createEncryptedJwe();
+        $successJwk = null;
+        static::assertTrue($decrypter->decryptUsingKeySet(
+            $keySetFixture['jwe'],
+            new JWKSet([$keySetFixture['receiverKey']]),
+            0,
+            $successJwk,
+            $keySetFixture['senderKey']
+        ));
+        static::assertSame($keySetFixture['payload'], $keySetFixture['jwe']->getPayload());
+    }
+
+    #[Test]
     public static function configuredBundleDecrypterRejectsEcdhSsTokenWhenAlgorithmsExcludeEcdhSs(): void
     {
         static::ensureKernelShutdown();
         $client = static::createClient();
         $container = $client->getContainer();
 
-        $algorithmManagerFactory = $container->get(AlgorithmManagerFactory::class);
-        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe(
-            new JWEBuilderFactory($algorithmManagerFactory)
-        );
+        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe();
 
         /** @var JWEDecrypter $decrypter */
         $decrypter = $container->get('jose.jwe_decrypter.loader2');
@@ -79,6 +104,28 @@ final class JweEcdhSsAllowListTest extends WebTestCase
             $fixture['receiverKey'],
             $fixture['senderKey']
         ));
+    }
+
+    #[Test]
+    public static function configuredBundleDecrypterAcceptsEcdhSsTokenWhenAlgorithmsIncludeEcdhSs(): void
+    {
+        static::ensureKernelShutdown();
+        $client = static::createClient();
+        $container = $client->getContainer();
+
+        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe();
+
+        /** @var JWEDecrypter $decrypter */
+        $decrypter = $container->get('jose.jwe_decrypter.ecdh_ss_loader');
+        static::assertTrue($decrypter->getKeyEncryptionAlgorithmManager()->has('ECDH-SS+A128KW'));
+
+        static::assertTrue($decrypter->decryptUsingKey(
+            $fixture['jwe'],
+            $fixture['receiverKey'],
+            0,
+            $fixture['senderKey']
+        ));
+        static::assertSame($fixture['payload'], $fixture['jwe']->getPayload());
     }
 
     private static function attemptDecryptUsingKey(
@@ -95,7 +142,7 @@ final class JweEcdhSsAllowListTest extends WebTestCase
     }
 
     /**
-     * @param-out null $successJwk
+     * @param-out null|JWK $successJwk
      */
     private static function attemptDecryptUsingKeySet(
         JWEDecrypter $decrypter,

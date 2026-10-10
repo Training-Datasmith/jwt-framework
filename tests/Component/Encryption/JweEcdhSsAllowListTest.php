@@ -30,7 +30,7 @@ final class JweEcdhSsAllowListTest extends EncryptionTestCase
     #[Test]
     public function decryptUsingKeyRejectsEcdhSsTokenWhenAlgorithmIsNotAllowListed(): void
     {
-        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe($this->getJWEBuilderFactory());
+        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe();
         $decrypter = $this->getJWEDecrypterFactory()->create(self::ALLOWED_WITHOUT_ECDH_SS);
 
         $this->assertEcdhSsAlgorithmsAreExcluded($decrypter);
@@ -47,7 +47,7 @@ final class JweEcdhSsAllowListTest extends EncryptionTestCase
     #[Test]
     public function decryptUsingKeySetRejectsEcdhSsTokenWhenAlgorithmIsNotAllowListed(): void
     {
-        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe($this->getJWEBuilderFactory());
+        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe();
         $decrypter = $this->getJWEDecrypterFactory()->create(self::ALLOWED_WITHOUT_ECDH_SS);
         $successJwk = null;
 
@@ -66,7 +66,7 @@ final class JweEcdhSsAllowListTest extends EncryptionTestCase
     #[Test]
     public function decryptUsingKeyAcceptsEcdhSsTokenWhenAlgorithmIsAllowListed(): void
     {
-        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe($this->getJWEBuilderFactory());
+        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe();
         $decrypter = $this->getJWEDecrypterFactory()->create(self::ALLOWED_WITH_ECDH_SS);
 
         static::assertTrue($decrypter->getKeyEncryptionAlgorithmManager()->has('ECDH-SS+A128KW'));
@@ -74,6 +74,24 @@ final class JweEcdhSsAllowListTest extends EncryptionTestCase
             $fixture['jwe'],
             $fixture['receiverKey'],
             0,
+            $fixture['senderKey']
+        ));
+        static::assertSame($fixture['payload'], $fixture['jwe']->getPayload());
+    }
+
+    #[Test]
+    public function decryptUsingKeySetAcceptsEcdhSsTokenWhenAlgorithmIsAllowListed(): void
+    {
+        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe();
+        $decrypter = $this->getJWEDecrypterFactory()->create(self::ALLOWED_WITH_ECDH_SS);
+        $successJwk = null;
+
+        static::assertTrue($decrypter->getKeyEncryptionAlgorithmManager()->has('ECDH-SS+A128KW'));
+        static::assertTrue($decrypter->decryptUsingKeySet(
+            $fixture['jwe'],
+            new JWKSet([$fixture['receiverKey']]),
+            0,
+            $successJwk,
             $fixture['senderKey']
         ));
         static::assertSame($fixture['payload'], $fixture['jwe']->getPayload());
