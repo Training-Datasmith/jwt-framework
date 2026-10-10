@@ -92,12 +92,21 @@ final class JweEcdhSsAllowListTest extends WebTestCase
         $client = static::createClient();
         $container = $client->getContainer();
 
-        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe();
-
         /** @var JWEDecrypter $decrypter */
         $decrypter = $container->get('jose.jwe_decrypter.loader2');
         static::assertFalse($decrypter->getKeyEncryptionAlgorithmManager()->has('ECDH-SS+A128KW'));
 
+        $keySetFixture = EcdhSsA128KwJweFixture::createEncryptedJwe();
+        $successJwk = null;
+        static::assertFalse(self::attemptDecryptUsingKeySet(
+            $decrypter,
+            $keySetFixture['jwe'],
+            $keySetFixture['receiverKey'],
+            $successJwk,
+            $keySetFixture['senderKey']
+        ));
+
+        $fixture = EcdhSsA128KwJweFixture::createEncryptedJwe();
         static::assertFalse(self::attemptDecryptUsingKey(
             $decrypter,
             $fixture['jwe'],
@@ -126,6 +135,17 @@ final class JweEcdhSsAllowListTest extends WebTestCase
             $fixture['senderKey']
         ));
         static::assertSame($fixture['payload'], $fixture['jwe']->getPayload());
+
+        $keySetFixture = EcdhSsA128KwJweFixture::createEncryptedJwe();
+        $successJwk = null;
+        static::assertTrue($decrypter->decryptUsingKeySet(
+            $keySetFixture['jwe'],
+            new JWKSet([$keySetFixture['receiverKey']]),
+            0,
+            $successJwk,
+            $keySetFixture['senderKey']
+        ));
+        static::assertSame($keySetFixture['payload'], $keySetFixture['jwe']->getPayload());
     }
 
     private static function attemptDecryptUsingKey(
